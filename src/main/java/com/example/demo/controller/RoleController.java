@@ -22,7 +22,7 @@ public class RoleController {
 	@Autowired
 	RoleService roleService;
 
-	@PreAuthorize("hasAnyRole('ADD_ROLE')")
+	@PreAuthorize("hasAuthority('ADD_ROLE')")
 	@PostMapping
 	public HttpEntity<?> createRole(@Valid @RequestBody RoleDto roleDto) {
 		ApiResponse apiResponse = roleService.createRole(roleDto);
