@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.RegisterDto;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.service.AuthService;
@@ -24,6 +25,12 @@ public class AuthController {
 	@PostMapping("/register")
 	public HttpEntity<?> registerUser(@Valid @RequestBody RegisterDto registerDto) {
 		ApiResponse apiResponse = authService.registerUser(registerDto);
+		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+	}
+	
+	@PostMapping("/login")
+	public HttpEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto) {
+		ApiResponse apiResponse = authService.loginUser(loginDto);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 }
