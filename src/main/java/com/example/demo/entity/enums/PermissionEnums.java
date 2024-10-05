@@ -8,5 +8,6 @@ public enum PermissionEnums {
 	ADD_ROLE,
 	EDIT_ROLE,
 	DELETE_ROLE,
-	VIEW_ROLE
+	VIEW_ROLE,
+	ADD_PERMISSION
 }

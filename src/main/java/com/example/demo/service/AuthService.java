@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,8 @@ import jakarta.validation.Valid;
 
 @Service
 public class AuthService implements UserDetailsService {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
 	@Autowired
 	UserRepository userRepository;
@@ -57,14 +61,17 @@ public class AuthService implements UserDetailsService {
 		return new ApiResponse("Successfully", true);
 	}
 	
-
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<User> optionalUser = userRepository.findByUsername(username);
-		if (optionalUser.isPresent())
+		if (optionalUser.isPresent()) {
+			logger.info("Loaded user: " + optionalUser.get().getUsername());
+			logger.info("Authorities: " + optionalUser.get().getAuthorities());
 			return optionalUser.get();
+		}
 		throw new UsernameNotFoundException(username + " not found");
 	}
+	
 
 	public ApiResponse loginUser(@Valid LoginDto loginDto) {
 		Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
