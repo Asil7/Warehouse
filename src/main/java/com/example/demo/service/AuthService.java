@@ -14,8 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.LoginDto;
-import com.example.demo.dto.RegisterDto;
+import com.example.demo.dto.user.LoginDto;
+import com.example.demo.dto.user.RegisterDto;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.Status;
@@ -58,7 +58,7 @@ public class AuthService implements UserDetailsService {
 		User user = new User(registerDto.getFullName(), registerDto.getUsername(),
 				passwordEncoder.encode(registerDto.getPassword()), optionalRole.get(), Status.INACTIVE);
 		userRepository.save(user);
-		return new ApiResponse("Successfully", true);
+		return new ApiResponse("user successfully created", true);
 	}
 	
 	@Override
@@ -75,7 +75,10 @@ public class AuthService implements UserDetailsService {
 
 	public ApiResponse loginUser(@Valid LoginDto loginDto) {
 		Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-		User user = (User)authenticate.getPrincipal();
+		User user = (User) authenticate.getPrincipal();
+		if (user.getStatus() == Status.INACTIVE) {
+			return new ApiResponse("User is inactive", false);
+		}
 		String token = jwtProvider.generateToken(user.getUsername(), user.getRole());
 		return new ApiResponse("Token", true, token);
 	}

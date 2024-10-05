@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.user;
 
 
 import jakarta.validation.constraints.NotNull;
@@ -9,20 +9,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterDto {
+public class UserDto {
 	
 	@NotNull(message = "FullName is empty")
 	private String fullName;
 	
 	@NotNull(message = "Username is empty")
 	private String username;
-	
+
 	@NotNull(message = "Password is empty")
 	private String password;
-	
+
 	@NotNull(message = "Role id is empty")
 	private Long roleId;
-	
-	@NotNull(message = "Pre Password is empty")
-	private String prePassword;
 }

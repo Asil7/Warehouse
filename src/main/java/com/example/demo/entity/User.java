@@ -10,6 +10,8 @@ import com.example.demo.entity.template.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,11 +37,17 @@ public class User extends AbstractEntity implements UserDetails{
 	@ManyToOne(optional = false)
 	private Role role;
 	
+	@Enumerated(value = EnumType.STRING)
 	private Status status;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return role.getAuthorities();
+	}
+	
+	@Override
+    public boolean isEnabled() {
+        return this.status == Status.ACTIVE;
     }
 	
 }
