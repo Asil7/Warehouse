@@ -16,6 +16,4 @@ import lombok.NoArgsConstructor;
 public class Permission extends AbstractEntity {
 	
 	private String name;
-	
-	private boolean assigned;
 }

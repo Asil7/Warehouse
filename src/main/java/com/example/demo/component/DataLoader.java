@@ -43,7 +43,6 @@ public class DataLoader implements CommandLineRunner {
 			for (PermissionEnums permissionEnum : PermissionEnums.values()) {
 				Permission permission = new Permission();
 				permission.setName(permissionEnum.toString());
-				permission.setAssigned(false);
 				permissionRepository.save(permission);
 			}
 			

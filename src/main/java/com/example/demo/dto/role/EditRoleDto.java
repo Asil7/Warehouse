@@ -1,9 +1,6 @@
-package com.example.demo.dto;
-
-import java.util.List;
+package com.example.demo.dto.role;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,13 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleDto {
+public class EditRoleDto {
 
     @NotBlank
     private String name;
-
-    @NotNull
-    private List<Long> permissionIds; 
 
     private String description;
 }

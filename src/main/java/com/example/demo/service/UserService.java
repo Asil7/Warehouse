@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.user.UserDto;
+import com.example.demo.dto.user.UserProjection;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.Status;
@@ -25,6 +27,12 @@ public class UserService {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
+
+	public ApiResponse getAllUsers() {
+		List<UserProjection> userList = userRepository.getAllUsers();
+		return new ApiResponse("User list", true, userList);
+	}
+
 
 		public ApiResponse addUser(UserDto userDto) {
 		Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
