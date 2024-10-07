@@ -18,7 +18,7 @@ import com.example.demo.repository.UserRepository;
 
 @Service
 public class UserService {
-	
+
 	@Autowired
 	UserRepository userRepository;
 
@@ -33,24 +33,28 @@ public class UserService {
 		return new ApiResponse("User list", true, userList);
 	}
 
+	public ApiResponse addUser(UserDto userDto) {
 
-		public ApiResponse addUser(UserDto userDto) {
 		Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
 		if (optionalRole.isEmpty()) {
 			return new ApiResponse("Role not found", false);
 		}
-		if (userRepository.existsByUsername(userDto.getUsername()))
-			return new ApiResponse("This user already exists", false);
-		User user = new User();
-		user.setFullName(userDto.getFullName());
-		user.setUsername(userDto.getUsername());
-		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-		user.setStatus(Status.INACTIVE);
-		userRepository.save(user);
-		return new ApiResponse("user successfully created", true);
+
+		String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+
+		User newUser = new User();
+		newUser.setFullName(userDto.getFullName());
+		newUser.setUsername(userDto.getUsername());
+		newUser.setPassword(encodedPassword);
+		newUser.setRole(optionalRole.get());
+		newUser.setStatus(Status.INACTIVE);
+
+		userRepository.save(newUser);
+
+		return new ApiResponse("User created successfully", true);
 	}
 
-		public ApiResponse editUser(Long id, UserDto userDto) {
+	public ApiResponse editUser(Long id, UserDto userDto) {
 		Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
 		if (optionalRole.isEmpty()) {
 			return new ApiResponse("Role not found", false);

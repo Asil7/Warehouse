@@ -21,86 +21,131 @@ import jakarta.validation.Valid;
 @Service
 public class RoleService {
 
-    @Autowired
-    RoleRepository roleRepository;
+	@Autowired
+	RoleRepository roleRepository;
 
-    @Autowired
-    PermissionRepository permissionRepository;
+	@Autowired
+	PermissionRepository permissionRepository;
 
-    public ApiResponse createRole(@Valid RoleDto roleDto) {
-        if (roleRepository.existsByName(roleDto.getName())) {
-            return new ApiResponse("Role with the name " + roleDto.getName() + " already exists.", false);
-        }
+	public ApiResponse createRole(@Valid RoleDto roleDto) {
+		if (roleRepository.existsByName(roleDto.getName())) {
+			return new ApiResponse("Role with the name " + roleDto.getName() + " already exists.", false);
+		}
 
-        List<Permission> permissions = permissionRepository.findAllById(roleDto.getPermissionIds());
+		List<Permission> permissions = permissionRepository.findAllById(roleDto.getPermissionIds());
 
-        if (permissions.size() != roleDto.getPermissionIds().size()) {
-            return new ApiResponse("One or more permissions do not exist.", false);
-        }
+		if (permissions.size() != roleDto.getPermissionIds().size()) {
+			return new ApiResponse("One or more permissions do not exist.", false);
+		}
 
-        Role role = new Role();
-        role.setName(roleDto.getName());
-        role.setPermissions(permissions);
-        role.setDescription(roleDto.getDescription());
-        roleRepository.save(role);
+		Role role = new Role();
+		role.setName(roleDto.getName());
+		role.setPermissions(permissions);
+		role.setDescription(roleDto.getDescription());
+		roleRepository.save(role);
 
-        return new ApiResponse("Role successfully created", true);
-    }
+		return new ApiResponse("Role successfully created", true);
+	}
 
-    public ApiResponse editRole(@Valid Long id, EditRoleDto editRoleDto) {
-        if (roleRepository.existsByName(editRoleDto.getName())) {
-            return new ApiResponse("Role with the name " + editRoleDto.getName() + " already exists.", false);
-        }
+	public ApiResponse editRole(@Valid Long id, EditRoleDto editRoleDto) {
+		if (roleRepository.existsByName(editRoleDto.getName())) {
+			return new ApiResponse("Role with the name " + editRoleDto.getName() + " already exists.", false);
+		}
 
-        Optional<Role> optionalRole = roleRepository.findById(id);
-        if (optionalRole.isPresent()) {
-            Role role = optionalRole.get();
+		Optional<Role> optionalRole = roleRepository.findById(id);
+		if (optionalRole.isPresent()) {
+			Role role = optionalRole.get();
 
-            role.setName(editRoleDto.getName());
-            role.setDescription(editRoleDto.getDescription());
-            roleRepository.save(role);
+			role.setName(editRoleDto.getName());
+			role.setDescription(editRoleDto.getDescription());
+			roleRepository.save(role);
 
-            return new ApiResponse("Role successfully updated", true);
-        } else {
-            return new ApiResponse("Role not found", false);
-        }
-    }
-    
-    public ApiResponse getRoleList() {
-        List<RoleProjection> roleList = roleRepository.getAllRoles();
-        return new ApiResponse("Role List", true, roleList);
-    }
+			return new ApiResponse("Role successfully updated", true);
+		} else {
+			return new ApiResponse("Role not found", false);
+		}
+	}
 
-    public ApiResponse getRolePermissions(Long roleId) {
-        Optional<Role> optionalRole = roleRepository.findById(roleId);
+	public ApiResponse getRoleList() {
+		List<RoleProjection> roleList = roleRepository.getAllRoles();
+		return new ApiResponse("Role List", true, roleList);
+	}
 
-        if (optionalRole.isPresent()) {
-            Role role = optionalRole.get();
-            List<Permission> permissions = role.getPermissions();
+	public ApiResponse getRolePermissions(Long roleId) {
+		Optional<Role> optionalRole = roleRepository.findById(roleId);
 
-            return new ApiResponse("Role permissions", true, permissions);
-        } else {
-            return new ApiResponse("Role not found", false);
-        }
-    }
+		if (optionalRole.isPresent()) {
+			Role role = optionalRole.get();
+			List<Permission> permissions = role.getPermissions();
 
-    public ApiResponse getPermissionsNotInRole(Long roleId) {
-        Optional<Role> optionalRole = roleRepository.findById(roleId);
+			return new ApiResponse("Role permissions", true, permissions);
+		} else {
+			return new ApiResponse("Role not found", false);
+		}
+	}
 
-        if (optionalRole.isPresent()) {
-            Role role = optionalRole.get();
+	public ApiResponse getPermissionsNotInRole(Long roleId) {
+		Optional<Role> optionalRole = roleRepository.findById(roleId);
 
-            List<Permission> allPermissions = permissionRepository.findAll();
+		if (optionalRole.isPresent()) {
+			Role role = optionalRole.get();
 
-            List<Permission> rolePermissions = role.getPermissions();
+			List<Permission> allPermissions = permissionRepository.findAll();
 
-            List<Permission> permissionsNotInRole = allPermissions.stream()
-                .filter(permission -> !rolePermissions.contains(permission))
-                .collect(Collectors.toList());
+			List<Permission> rolePermissions = role.getPermissions();
 
-            return new ApiResponse("Permissions not in the role", true, permissionsNotInRole);
-        } else {
-            return new ApiResponse("Role not found", false);
-        }
-    }
+			List<Permission> permissionsNotInRole = allPermissions.stream()
+					.filter(permission -> !rolePermissions.contains(permission)).collect(Collectors.toList());
+
+			return new ApiResponse("Permissions not in the role", true, permissionsNotInRole);
+		} else {
+			return new ApiResponse("Role not found", false);
+		}
+	}
+
+	public ApiResponse addPermissionToRole(Long roleId, Long permissionId) {
+		Optional<Role> optionalRole = roleRepository.findById(roleId);
+		if (!optionalRole.isPresent()) {
+			return new ApiResponse("Role not found", false);
+		}
+
+		Optional<Permission> optionalPermission = permissionRepository.findById(permissionId);
+		if (!optionalPermission.isPresent()) {
+			return new ApiResponse("Permission not found", false);
+		}
+
+		Role role = optionalRole.get();
+		Permission permission = optionalPermission.get();
+
+		if (role.getPermissions().contains(permission)) {
+			return new ApiResponse("Permission is already assigned to the role", false);
+		}
+
+		role.getPermissions().add(permission);
+		roleRepository.save(role);
+		return new ApiResponse("Permission added to role", true);
+	}
+
+	public ApiResponse deletePermissionFromRole(Long roleId, Long permissionId) {
+		Optional<Role> optionalRole = roleRepository.findById(roleId);
+		if (!optionalRole.isPresent()) {
+			return new ApiResponse("Role not found", false);
+		}
+
+		Optional<Permission> optionalPermission = permissionRepository.findById(permissionId);
+		if (!optionalPermission.isPresent()) {
+			return new ApiResponse("Permission not found", false);
+		}
+
+		Role role = optionalRole.get();
+		Permission permission = optionalPermission.get();
+
+		if (!role.getPermissions().contains(permission)) {
+			return new ApiResponse("Permission is not assigned to the role", false);
+		}
+
+		role.getPermissions().remove(permission);
+		roleRepository.save(role);
+		return new ApiResponse("Permission removed from role", true);
+	}
 }

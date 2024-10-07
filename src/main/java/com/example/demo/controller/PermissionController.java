@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @RestController
 @RequestMapping("/api/permission")
 public class PermissionController {
@@ -48,7 +47,7 @@ public class PermissionController {
 		ApiResponse apiResponse = permissionService.getAllPermissions();
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
-	
+
 	@PreAuthorize("hasAuthority('DELETE_PERMISSION')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deletePermission(@PathVariable Long id) {

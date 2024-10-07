@@ -52,14 +52,14 @@ public class PermissionService {
 			return new ApiResponse("Permission not found", true);
 		}
 	}
-	
+
 	public ApiResponse getAllPermissions() {
 		List<Permission> permissionList = permissionRepository.findAll();
 		return new ApiResponse("Permission List", true, permissionList);
 	}
 
 	public ApiResponse deletePermission(Long id) {
-	   Optional<Permission> permissOptional = permissionRepository.findById(id);
+		Optional<Permission> permissOptional = permissionRepository.findById(id);
 		if (permissOptional.isPresent()) {
 			Permission permission = permissOptional.get();
 

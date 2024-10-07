@@ -15,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.user.LoginDto;
-import com.example.demo.dto.user.RegisterDto;
-import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.Status;
 import com.example.demo.payload.ApiResponse;
@@ -39,28 +37,13 @@ public class AuthService implements UserDetailsService {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	
-	@Autowired 
+
+	@Autowired
 	AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	JwtProvider jwtProvider;
 
-	public ApiResponse registerUser(RegisterDto registerDto) {
-		Optional<Role> optionalRole = roleRepository.findById(registerDto.getRoleId());
-		if (optionalRole.isEmpty()) {
-			return new ApiResponse("Role not found", false);
-		}
-		if (!registerDto.getPassword().equals(registerDto.getPrePassword()))
-			return new ApiResponse("Pre Password is invalid", false);
-		if (userRepository.existsByUsername(registerDto.getUsername()))
-			return new ApiResponse("This user already exists", false);
-		User user = new User(registerDto.getFullName(), registerDto.getUsername(),
-				passwordEncoder.encode(registerDto.getPassword()), optionalRole.get(), Status.INACTIVE);
-		userRepository.save(user);
-		return new ApiResponse("user successfully created", true);
-	}
-	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<User> optionalUser = userRepository.findByUsername(username);
@@ -71,10 +54,10 @@ public class AuthService implements UserDetailsService {
 		}
 		throw new UsernameNotFoundException(username + " not found");
 	}
-	
 
 	public ApiResponse loginUser(@Valid LoginDto loginDto) {
-		Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+		Authentication authenticate = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
 		User user = (User) authenticate.getPrincipal();
 		if (user.getStatus() == Status.INACTIVE) {
 			return new ApiResponse("User is inactive", false);
