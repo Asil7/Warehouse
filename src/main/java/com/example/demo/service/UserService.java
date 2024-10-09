@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.user.UserDto;
+import com.example.demo.dto.user.UserEditDto;
 import com.example.demo.dto.user.UserProjection;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
@@ -54,22 +55,26 @@ public class UserService {
 		return new ApiResponse("User created successfully", true);
 	}
 
-	public ApiResponse editUser(Long id, UserDto userDto) {
-		Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
+	public ApiResponse editUser(Long id, UserEditDto userEditDto) {
+		Optional<Role> optionalRole = roleRepository.findById(userEditDto.getRoleId());
 		if (optionalRole.isEmpty()) {
 			return new ApiResponse("Role not found", false);
 		}
-		if (userRepository.existsByUsername(userDto.getUsername()))
-			return new ApiResponse("This user already exists", false);
+
 		Optional<User> optionalUser = userRepository.findById(id);
 		if (optionalUser.isPresent()) {
 			User user = optionalUser.get();
-			user.setFullName(userDto.getFullName());
-			user.setUsername(userDto.getUsername());
-			user.setPassword(userDto.getPassword());
+			if (!user.getUsername().equals(userEditDto.getUsername())
+					&& userRepository.existsByUsername(userEditDto.getUsername())) {
+				return new ApiResponse("This user already exists", false);
+			}
+			
+			user.setFullName(userEditDto.getFullName());
+			user.setUsername(userEditDto.getUsername());
 			user.setRole(optionalRole.get());
 			userRepository.save(user);
-			return new ApiResponse("user successfully updated", true);
+
+			return new ApiResponse("User successfully updated", true);
 		} else {
 			return new ApiResponse("User not found", false);
 		}
@@ -86,12 +91,34 @@ public class UserService {
 			return new ApiResponse("User not found", false);
 		}
 	}
+	
+	public ApiResponse updatePassword(Long id, String password) {
+		Optional<User> optionalUser = userRepository.findById(id);
+		String encodedPassword = passwordEncoder.encode(password);
+		if (optionalUser.isPresent()) {
+			User user = optionalUser.get();
+			user.setPassword(encodedPassword);
+			userRepository.save(user);
+			return new ApiResponse("User password updated successfully", true);
+		} else {
+			return new ApiResponse("User not found", false);
+		}
+	}
 
 	public ApiResponse deleteUser(Long id) {
 		Optional<User> optionalUser = userRepository.findById(id);
 		if (optionalUser.isPresent()) {
 			userRepository.deleteById(id);
 			return new ApiResponse("User successfully deleted", true);
+		} else {
+			return new ApiResponse("User not found", false);
+		}
+	}
+
+	public ApiResponse getUserById(Long id) {
+		Optional<UserProjection> userById = userRepository.getUserById(id);
+		if (userById.isPresent()) {
+			return new ApiResponse("User by id", true, userById);
 		} else {
 			return new ApiResponse("User not found", false);
 		}

@@ -7,6 +7,8 @@ public enum PermissionEnums {
 	EDIT_USER_STATUS,
 	DELETE_USER,
 	VIEW_USER_LIST,
+	VIEW_USER,
+	EDIT_USER_PASSWORD,
 	
 	// Role
 	ADD_ROLE,

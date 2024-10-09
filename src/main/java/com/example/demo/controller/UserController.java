@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.user.UserDto;
+import com.example.demo.dto.user.UserEditDto;
 import com.example.demo.entity.enums.Status;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.service.UserService;
@@ -31,6 +32,13 @@ public class UserController {
 		ApiResponse apiResponse = userService.getAllUsers();
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
+	
+	@PreAuthorize("hasAuthority('VIEW_USER')")
+	@GetMapping("/{id}")
+	public HttpEntity<?> getUserById(@PathVariable Long id) {
+		ApiResponse apiResponse = userService.getUserById(id);
+		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+	}
 
 	@PreAuthorize("hasAuthority('ADD_USER')")
 	@PostMapping()
@@ -41,8 +49,8 @@ public class UserController {
 
 	@PreAuthorize("hasAuthority('EDIT_USER')")
 	@PutMapping("/{id}")
-	public HttpEntity<?> editUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-		ApiResponse apiResponse = userService.editUser(id, userDto);
+	public HttpEntity<?> editUser(@PathVariable Long id, @RequestBody UserEditDto userEditDto) {
+		ApiResponse apiResponse = userService.editUser(id, userEditDto);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
@@ -53,6 +61,13 @@ public class UserController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
+	@PreAuthorize("hasAuthority('EDIT_USER_PASSWORD')")
+	@PutMapping("/password/{id}")
+	public HttpEntity<?> updateStatus(@PathVariable Long id, @RequestBody String password) {
+		ApiResponse apiResponse = userService.updatePassword(id, password);
+		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+	}
+	
 	@PreAuthorize("hasAuthority('DELETE_USER')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deleteUser(@PathVariable Long id) {

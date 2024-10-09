@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.permission;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,4 +12,7 @@ public class PermissionDto {
 
 	@NotNull(message = "FullName is empty")
 	String name;
+	
+	@NotNull(message = "Description is empty")
+	String description;
 }
