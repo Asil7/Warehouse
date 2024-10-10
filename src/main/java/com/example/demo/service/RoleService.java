@@ -12,9 +12,11 @@ import com.example.demo.dto.role.RoleDto;
 import com.example.demo.dto.role.RoleProjection;
 import com.example.demo.entity.Permission;
 import com.example.demo.entity.Role;
+import com.example.demo.entity.User;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.repository.PermissionRepository;
 import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
 
 import jakarta.validation.Valid;
 
@@ -23,6 +25,9 @@ public class RoleService {
 
 	@Autowired
 	RoleRepository roleRepository;
+
+	@Autowired
+	UserRepository userRepository;
 
 	@Autowired
 	PermissionRepository permissionRepository;
@@ -48,13 +53,14 @@ public class RoleService {
 	}
 
 	public ApiResponse editRole(@Valid Long id, EditRoleDto editRoleDto) {
-		if (roleRepository.existsByName(editRoleDto.getName())) {
-			return new ApiResponse("Role with the name " + editRoleDto.getName() + " already exists.", false);
-		}
 
 		Optional<Role> optionalRole = roleRepository.findById(id);
 		if (optionalRole.isPresent()) {
 			Role role = optionalRole.get();
+			
+	        if (roleRepository.existsByNameAndIdNot(editRoleDto.getName(), id)) {
+	            return new ApiResponse("Role with the name " + editRoleDto.getName() + " already exists.", false);
+	        }
 
 			role.setName(editRoleDto.getName());
 			role.setDescription(editRoleDto.getDescription());
@@ -69,6 +75,15 @@ public class RoleService {
 	public ApiResponse getRoleList() {
 		List<RoleProjection> roleList = roleRepository.getAllRoles();
 		return new ApiResponse("Role List", true, roleList);
+	}
+	
+	public ApiResponse getRoleById(Long id) {
+		Optional<RoleProjection> roleById = roleRepository.getRoleById(id);
+		if (roleById.isPresent()) {
+			return new ApiResponse("Role By Id", true, roleById);
+		} else {
+			return new ApiResponse("Role not found", false);
+		}
 	}
 
 	public ApiResponse getRolePermissions(Long roleId) {
@@ -147,5 +162,19 @@ public class RoleService {
 		role.getPermissions().remove(permission);
 		roleRepository.save(role);
 		return new ApiResponse("Permission removed from role", true);
+	}
+
+	public ApiResponse deleteRole(Long roleId) {
+		Optional<Role> optionalRole = roleRepository.findById(roleId);
+		if (optionalRole.isEmpty()) {
+			return new ApiResponse("Role not found", false);
+		}
+		Role role = optionalRole.get();
+		List<User> userWithRole = userRepository.findByRole(role);
+		if (!userWithRole.isEmpty()) {
+			return new ApiResponse("Cannot delete role. It is associated with users.", false);
+		}
+		roleRepository.delete(role);
+		return new ApiResponse("Role deleted", true);
 	}
 }

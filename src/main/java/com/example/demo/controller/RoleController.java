@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +47,13 @@ public class RoleController {
 		ApiResponse apiResponse = roleService.getRoleList();
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
+	
+	@PreAuthorize("hasAuthority('VIEW_ROLE')")
+	@GetMapping("/{id}")
+	public HttpEntity<?> getRoleById(@PathVariable Long id) {
+		ApiResponse apiResponse = roleService.getRoleById(id);
+		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+	}
 
 	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
 	@GetMapping("/{roleId}/permissions")
@@ -72,6 +80,13 @@ public class RoleController {
 	@PutMapping("/deletePermission/{roleId}/{permissionId}")
 	public HttpEntity<?> deletePermissionFromRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
 		ApiResponse apiResponse = roleService.deletePermissionFromRole(roleId, permissionId);
+		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+	}
+	
+	@PreAuthorize("hasAuthority('DELETE_ROLE')")
+	@DeleteMapping("/{roleId}")
+	public HttpEntity<?> deleteRole(@PathVariable Long roleId) {
+		ApiResponse apiResponse = roleService.deleteRole(roleId);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
