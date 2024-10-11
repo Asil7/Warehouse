@@ -52,7 +52,7 @@ public class PermissionService {
 	        existingPermission.setDescription(permissionDto.getDescription());
 	        permissionRepository.save(existingPermission);
 
-	        return new ApiResponse("Permission successfully updated", true);
+	        return new ApiResponse("Permission updated", true);
 	    } else {
 	        return new ApiResponse("Permission not found", false);
 	    }
