@@ -40,6 +40,10 @@ public class User extends AbstractEntity implements UserDetails{
 	@Enumerated(value = EnumType.STRING)
 	private Status status;
 
+	@Column(length = 1024)
+	private String token;
+	
+
     @Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return role.getAuthorities();

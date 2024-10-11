@@ -59,26 +59,27 @@ public class AuthService implements UserDetailsService {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-
+	
 			User user = (User) authenticate.getPrincipal();
-
+	
 			if (user.getStatus() == Status.INACTIVE) {
 				return new ApiResponse("User is inactive", false);
 			}
-
+	
 			String token = jwtProvider.generateToken(user.getUsername(), user.getRole());
+	
+			user.setToken(token);
+			userRepository.save(user);
+	
 			return new ApiResponse("Token generated successfully", true, token);
-
+	
 		} catch (BadCredentialsException e) {
 			return new ApiResponse("Invalid username or password", false);
 		} catch (DisabledException e) {
-			// Handle case when user account is disabled
 			return new ApiResponse("User account is disabled", false);
 		} catch (Exception e) {
-			// Handle any other exceptions
 			logger.error("Login error: ", e);
 			return new ApiResponse("An error occurred during login", false);
 		}
 	}
-
 }

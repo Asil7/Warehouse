@@ -26,7 +26,7 @@ public class UserController {
 	@Autowired
 	UserService userService;
 
-	@PreAuthorize("hasAuthority('VIEW_USER_LIST')")
+	// @PreAuthorize("hasAuthority('VIEW_USER_LIST')")
 	@GetMapping()
 	public HttpEntity<?> getUserList() {
 		ApiResponse apiResponse = userService.getAllUsers();
