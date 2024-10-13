@@ -7,6 +7,9 @@ public interface UserProjection {
     String getFullName();
     String getUsername();
     String getStatus();
+    String getDateOfEmployment();
+    String getSalary();
+    String getPhone();
     String getRoleName();
     Timestamp getCreatedAt();
 }

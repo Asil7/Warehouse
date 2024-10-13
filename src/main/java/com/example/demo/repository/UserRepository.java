@@ -18,11 +18,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	
 	List<User> findByRole(Role role);
 
-	@Query(value = "SELECT u.id AS id, u.full_name AS fullName, u.username AS username, u.status AS status, r.name AS roleName, u.created_at AS createdAt "
+	@Query(value = "SELECT u.id AS id, u.full_name AS fullName, u.phone AS phone, u.salary AS salary, u.date_of_employment AS date_of_employment, u.username AS username, u.status AS status, r.name AS roleName, u.created_at AS createdAt "
 			+ "FROM users u " + "JOIN roles r ON u.role_id = r.id", nativeQuery = true)
 	List<UserProjection> getAllUsers();
 
-	@Query(value = "SELECT u.id AS id, u.full_name AS fullName, u.username AS username, u.status AS status, r.name AS roleName, u.created_at AS createdAt "
+	@Query(value = "SELECT u.id AS id, u.full_name AS fullName, u.phone AS phone, u.salary AS salary, u.date_of_employment AS date_of_employment, u.username AS username, u.status AS status, r.name AS roleName, u.created_at AS createdAt "
 			+ "FROM users u " + "JOIN roles r ON u.role_id = r.id " + "WHERE u.id = :id", nativeQuery = true)
 	Optional<UserProjection> getUserById(Long id);
 

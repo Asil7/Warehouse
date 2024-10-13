@@ -1,5 +1,6 @@
 package com.example.demo.component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,9 @@ public class DataLoader implements CommandLineRunner {
 			user.setPassword(passwordEncoder.encode("asil.777"));;
 			user.setRole(role);
 			user.setStatus(Status.ACTIVE);
+			user.setSalary("5000000");
+			user.setDateOfEmployment(LocalDate.of(2024, 10, 13));
+			user.setPhone("+998999999999");
 			userRepository.save(user);
 		}
 	}

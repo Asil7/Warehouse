@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -31,12 +32,20 @@ public class User extends AbstractEntity implements UserDetails{
 	@Column(nullable = false, unique = true)
 	private String username;
 	
+	private String phone;
+
 	@Column(nullable = false)
 	private String password;
 	
 	@ManyToOne(optional = false)
 	private Role role;
 	
+	@Column(nullable = false)
+	private String salary;
+
+	@Column(nullable = false)
+	private LocalDate dateOfEmployment;
+
 	@Enumerated(value = EnumType.STRING)
 	private Status status;
 
