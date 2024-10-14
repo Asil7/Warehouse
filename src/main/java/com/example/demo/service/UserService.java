@@ -47,12 +47,15 @@ public class UserService {
 		newUser.setFullName(userDto.getFullName());
 		newUser.setUsername(userDto.getUsername());
 		newUser.setPassword(encodedPassword);
+		newUser.setSalary(userDto.getSalary());
+		newUser.setPhone(userDto.getPhone());
+		newUser.setDateOfEmployment(userDto.getDateOfEmployment());
 		newUser.setRole(optionalRole.get());
 		newUser.setStatus(Status.INACTIVE);
 
 		userRepository.save(newUser);
 
-		return new ApiResponse("User created successfully", true);
+		return new ApiResponse("User created", true);
 	}
 
 	public ApiResponse editUser(Long id, UserEditDto userEditDto) {
@@ -71,10 +74,13 @@ public class UserService {
 			
 			user.setFullName(userEditDto.getFullName());
 			user.setUsername(userEditDto.getUsername());
+			user.setSalary(userEditDto.getSalary());
+			user.setPhone(userEditDto.getPhone());
+			user.setDateOfEmployment(userEditDto.getDateOfEmployment());
 			user.setRole(optionalRole.get());
 			userRepository.save(user);
 
-			return new ApiResponse("User successfully updated", true);
+			return new ApiResponse("User updated", true);
 		} else {
 			return new ApiResponse("User not found", false);
 		}
@@ -86,7 +92,7 @@ public class UserService {
 			User user = optionalUser.get();
 			user.setStatus(status);
 			userRepository.save(user);
-			return new ApiResponse("User status updated successfully", true);
+			return new ApiResponse("User status updated", true);
 		} else {
 			return new ApiResponse("User not found", false);
 		}
@@ -99,7 +105,7 @@ public class UserService {
 			User user = optionalUser.get();
 			user.setPassword(encodedPassword);
 			userRepository.save(user);
-			return new ApiResponse("User password updated successfully", true);
+			return new ApiResponse("User password updated", true);
 		} else {
 			return new ApiResponse("User not found", false);
 		}
@@ -109,7 +115,7 @@ public class UserService {
 		Optional<User> optionalUser = userRepository.findById(id);
 		if (optionalUser.isPresent()) {
 			userRepository.deleteById(id);
-			return new ApiResponse("User successfully deleted", true);
+			return new ApiResponse("User deleted", true);
 		} else {
 			return new ApiResponse("User not found", false);
 		}
