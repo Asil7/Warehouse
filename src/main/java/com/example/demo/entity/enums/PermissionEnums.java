@@ -32,4 +32,35 @@ public enum PermissionEnums {
 	VIEW_COMPANY,
 	DELETE_COMPANY,
 	EDIT_COMPANY,
+	
+	//PRODUCT
+	ADD_PRODUCT,
+	EDIT_PRODUCT,
+	VIEW_PRODUCT_LIST,
+	DELETE_PRODUCT,
+	
+	//SPAN
+	ADD_SPAN,
+	EDIT_SPAN,
+	VIEW_SPAN_LIST,
+	DELETE_SPAN,
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

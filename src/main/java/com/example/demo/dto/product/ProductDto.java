@@ -1,4 +1,4 @@
-package com.example.demo.dto.permission;
+package com.example.demo.dto.product;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PermissionDto {
-
+public class ProductDto {
 	@NotNull(message = "Name is empty")
 	String name;
 	
-	@NotNull(message = "Description is empty")
-	String description;
+	String type;
 }
