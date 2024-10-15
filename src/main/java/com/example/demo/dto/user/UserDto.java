@@ -14,7 +14,7 @@ public class UserDto {
     private String fullName;
     private String username;
     private String password;
-    private String salary;
+    private Double salary;
     private String phone;
     private LocalDate dateOfEmployment;
     private Long roleId;

@@ -18,9 +18,9 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Span extends AbstractEntity{
 	@Column(nullable = false)
-	private String why;
+	private String reason;
 	@Column(nullable = false)
-	private Double howMuch;
+	private Double price;
 	private String username;
 	@Column(nullable = false)
 	private LocalDate date;

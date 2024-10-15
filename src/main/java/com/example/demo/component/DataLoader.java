@@ -60,7 +60,7 @@ public class DataLoader implements CommandLineRunner {
 			user.setPassword(passwordEncoder.encode("asil.777"));;
 			user.setRole(role);
 			user.setStatus(Status.ACTIVE);
-			user.setSalary("5000000");
+			user.setSalary(500000.0);
 			user.setDateOfEmployment(LocalDate.of(2024, 10, 13));
 			user.setPhone("+998999999999");
 			userRepository.save(user);

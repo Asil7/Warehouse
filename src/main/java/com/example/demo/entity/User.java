@@ -41,7 +41,7 @@ public class User extends AbstractEntity implements UserDetails{
 	private Role role;
 	
 	@Column(nullable = false)
-	private String salary;
+	private Double salary;
 
 	@Column(nullable = false)
 	private LocalDate dateOfEmployment;

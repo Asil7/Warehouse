@@ -23,8 +23,8 @@ public class SpanService {
 		
 		Span span = new Span();
 		
-		span.setWhy(spanDto.getWhy());
-		span.setHowMuch(spanDto.getHowMuch());
+		span.setReason(spanDto.getReason());
+		span.setPrice(spanDto.getPrice());
 		span.setUsername(spanDto.getUsername());
 		span.setDate(spanDto.getDate());
 		
@@ -40,8 +40,8 @@ public class SpanService {
 	    if (spanOptional.isPresent()) {
 	        Span existingSpan = spanOptional.get();
 
-	        existingSpan.setWhy(spanDto.getWhy());
-	        existingSpan.setHowMuch(spanDto.getHowMuch());
+	        existingSpan.setReason(spanDto.getReason());
+	        existingSpan.setPrice(spanDto.getPrice());
 	        existingSpan.setUsername(spanDto.getUsername());
 	        existingSpan.setDate(spanDto.getDate());
 	        spanRepository.save(existingSpan);

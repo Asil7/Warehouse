@@ -14,7 +14,7 @@ public class UserEditDto {
     private String fullName;
     private String username;
     private String phone;
-    private String salary;
+    private Double salary;
     private LocalDate dateOfEmployment;
     private Long roleId;
 }

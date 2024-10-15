@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpanDto {
-	String why;
-	Double howMuch;
+	String reason;
+	Double price;
 	String username;
 	LocalDate date;
 }
