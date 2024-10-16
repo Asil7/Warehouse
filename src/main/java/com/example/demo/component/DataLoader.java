@@ -57,7 +57,7 @@ public class DataLoader implements CommandLineRunner {
 			User user = new User();
 			user.setFullName("Asilbek Fayzullayev");
 			user.setUsername("asilbek");
-			user.setPassword(passwordEncoder.encode("asil.777"));;
+			user.setPassword(passwordEncoder.encode("qwerty"));;
 			user.setRole(role);
 			user.setStatus(Status.ACTIVE);
 			user.setSalary(500000.0);

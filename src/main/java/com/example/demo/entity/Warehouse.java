@@ -1,7 +1,5 @@
 package com.example.demo.entity;
 
-import java.time.LocalDate;
-
 import com.example.demo.entity.template.AbstractEntity;
 
 import jakarta.persistence.Column;
@@ -16,12 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Span extends AbstractEntity {
+public class Warehouse extends AbstractEntity{
+	
+	@Column(nullable = false, unique = true)
+	private String product;
 	@Column(nullable = false)
-	private String reason;
-	@Column(nullable = false)
-	private Double price;
-	private String username;
-	@Column(nullable = false)
-	private LocalDate date;
+	private Long quantity;
 }

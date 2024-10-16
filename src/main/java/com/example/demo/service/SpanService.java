@@ -13,49 +13,57 @@ import com.example.demo.repository.SpanRepository;
 
 import jakarta.validation.Valid;
 
-@Service 
+@Service
 public class SpanService {
 
 	@Autowired
 	SpanRepository spanRepository;
-	
+
 	public ApiResponse createSpan(@Valid SpanDto spanDto) {
-		
+
 		Span span = new Span();
-		
+
 		span.setReason(spanDto.getReason());
 		span.setPrice(spanDto.getPrice());
 		span.setUsername(spanDto.getUsername());
 		span.setDate(spanDto.getDate());
-		
+
 		spanRepository.save(span);
-		
+
 		return new ApiResponse("Span created", true);
 	}
 
 	public ApiResponse editSpan(@Valid Long id, SpanDto spanDto) {
 
-	    Optional<Span> spanOptional = spanRepository.findById(id);
+		Optional<Span> spanOptional = spanRepository.findById(id);
 
-	    if (spanOptional.isPresent()) {
-	        Span existingSpan = spanOptional.get();
+		if (spanOptional.isPresent()) {
+			Span existingSpan = spanOptional.get();
 
-	        existingSpan.setReason(spanDto.getReason());
-	        existingSpan.setPrice(spanDto.getPrice());
-	        existingSpan.setUsername(spanDto.getUsername());
-	        existingSpan.setDate(spanDto.getDate());
-	        spanRepository.save(existingSpan);
+			existingSpan.setReason(spanDto.getReason());
+			existingSpan.setPrice(spanDto.getPrice());
+			existingSpan.setUsername(spanDto.getUsername());
+			existingSpan.setDate(spanDto.getDate());
+			spanRepository.save(existingSpan);
 
-	        return new ApiResponse("Span updated", true);
-	    } else {
-	        return new ApiResponse("Span not found", false);
-	    }
+			return new ApiResponse("Span updated", true);
+		} else {
+			return new ApiResponse("Span not found", false);
+		}
 	}
-
 
 	public ApiResponse getAllSpan() {
 		List<Span> spanList = spanRepository.findAll();
 		return new ApiResponse("Span List", true, spanList);
+	}
+
+	public ApiResponse getSpanByUsername(String username) {
+		try {
+			List<Span> findByUsername = spanRepository.findByUsername(username);
+			return new ApiResponse("Span by username", true, findByUsername);
+		} catch (Exception e) {
+			return new ApiResponse("An error occurred while fetching spans", false);
+		}
 	}
 
 	public ApiResponse deleteSpan(Long id) {

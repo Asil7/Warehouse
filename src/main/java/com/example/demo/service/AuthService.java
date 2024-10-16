@@ -68,8 +68,8 @@ public class AuthService implements UserDetailsService {
 	
 			String token = jwtProvider.generateToken(user.getUsername(), user.getRole());
 	
-			user.setToken(token);
-			userRepository.save(user);
+//			user.setToken(token);
+//			userRepository.save(user);
 	
 			return new ApiResponse("Token generated successfully", true, token);
 	

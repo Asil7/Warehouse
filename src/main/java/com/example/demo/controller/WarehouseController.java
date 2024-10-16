@@ -13,69 +13,45 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.span.SpanDto;
+import com.example.demo.dto.warehouse.WarehouseDto;
 import com.example.demo.payload.ApiResponse;
-import com.example.demo.service.SpanService;
+import com.example.demo.service.WarehouseService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/span")
-public class SpanController {
-	
+@RequestMapping("/api/warehouse")
+public class WarehouseController {
+
 	@Autowired
-	SpanService spanService;
+	WarehouseService warehouseService;
 
-	@PreAuthorize("hasAuthority('ADD_SPAN')")
+	@PreAuthorize("hasAuthority('ADD_WAREHOUSE_PRODUCT')")
 	@PostMapping
-	public HttpEntity<?> createPSpan(@Valid @RequestBody SpanDto spanDto) {
-		ApiResponse apiResponse = spanService.createSpan(spanDto);
+	public HttpEntity<?> createProduct(@Valid @RequestBody WarehouseDto warehouseDto) {
+		ApiResponse apiResponse = warehouseService.createProduct(warehouseDto);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_SPAN')")
+	@PreAuthorize("hasAuthority('EDIT_WAREHOUSE_PRODUCT')")
 	@PutMapping("/{id}")
-	public HttpEntity<?> editSpan(@Valid @PathVariable Long id, @RequestBody SpanDto spanDto) {
-		ApiResponse apiResponse = spanService.editSpan(id, spanDto);
+	public HttpEntity<?> editProduct(@Valid @PathVariable Long id, @RequestBody WarehouseDto warehouseDto) {
+		ApiResponse apiResponse = warehouseService.editProduct(id, warehouseDto);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('VIEW_SPAN_LIST')")
+	@PreAuthorize("hasAuthority('VIEW_WAREHOUSE_PRODUCT_LIST')")
 	@GetMapping
-	public HttpEntity<?> getSpan() {
-		ApiResponse apiResponse = spanService.getAllSpan();
+	public HttpEntity<?> getProduct() {
+		ApiResponse apiResponse = warehouseService.getAllProducts();
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('DELETE_SPAN')")
+	@PreAuthorize("hasAuthority('DELETE_WAREHOUSE_PRODUCT')")
 	@DeleteMapping("/{id}")
-	public HttpEntity<?> deleteSpan(@PathVariable Long id) {
-		ApiResponse apiResponse = spanService.deleteSpan(id);
+	public HttpEntity<?> deleteProduct(@PathVariable Long id) {
+		ApiResponse apiResponse = warehouseService.deleteProduct(id);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
-	
-	@PreAuthorize("hasAuthority('VIEW_SPAN_BY_USERNAME')")
-	@GetMapping("/{username}")
-	public HttpEntity<?> getSpanByUsername(@PathVariable String username) {
-		ApiResponse apiResponse = spanService.getSpanByUsername(username);
-		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-	}
-	
+
 }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
