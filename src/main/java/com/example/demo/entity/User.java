@@ -43,7 +43,6 @@ public class User extends AbstractEntity implements UserDetails{
 	@Column(nullable = false)
 	private Double salary;
 
-	@Column(nullable = false)
 	private LocalDate dateOfEmployment;
 
 	@Enumerated(value = EnumType.STRING)

@@ -74,11 +74,33 @@ public class WarehouseService {
 			return new ApiResponse("Product not found", false);
 		}
 	}
+	
+	public ApiResponse addQauntity(Long id, Long quantity) {
+		Optional<Warehouse> productOptional = warehouseRepository.findById(id);
+		if (productOptional.isPresent()) {
+			Warehouse existingProduct = productOptional.get();
+			long updatedQuantity = existingProduct.getQuantity() + quantity;
+			existingProduct.setQuantity(updatedQuantity);
+			warehouseRepository.save(existingProduct);
+			return new ApiResponse("Quantity updated", true);
+		} else {
+			return new ApiResponse("Product not found", false);
+		}
+	}
+
+	public ApiResponse subtractQuantity(Long id, Long quantity) {
+		Optional<Warehouse> productOptional = warehouseRepository.findById(id);
+		if (productOptional.isPresent()) {
+			Warehouse existingProduct = productOptional.get();
+			long updatedQuantity = existingProduct.getQuantity() - quantity;
+			existingProduct.setQuantity(updatedQuantity);
+			warehouseRepository.save(existingProduct);
+			return new ApiResponse("Quantity subtracted", true);
+		} else {
+			return new ApiResponse("Product not found", false);
+		}
+	}
 }
-
-
-
-
 
 
 

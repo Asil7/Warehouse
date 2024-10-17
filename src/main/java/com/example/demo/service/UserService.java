@@ -1,5 +1,8 @@
 package com.example.demo.service;
 
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +14,12 @@ import com.example.demo.dto.user.UserDto;
 import com.example.demo.dto.user.UserEditDto;
 import com.example.demo.dto.user.UserProjection;
 import com.example.demo.entity.Role;
+import com.example.demo.entity.Span;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.Status;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.SpanRepository;
 import com.example.demo.repository.UserRepository;
 
 @Service
@@ -28,6 +33,9 @@ public class UserService {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	SpanRepository spanRepository;
 
 	public ApiResponse getAllUsers() {
 		List<UserProjection> userList = userRepository.getAllUsers();
@@ -130,4 +138,90 @@ public class UserService {
 		}
 	}
 
+	public ApiResponse calculateUserSalary(Long userId, LocalDate givenDate) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            return new ApiResponse("User not found", false);
+        }
+
+        User user = optionalUser.get();
+
+        double dailySalary = user.getSalary() / 30;
+
+        long daysWorked = ChronoUnit.DAYS.between(user.getDateOfEmployment(), givenDate);
+        if (daysWorked < 0) {
+            return new ApiResponse("Invalid date, given date is before date of employment", false);
+        }
+
+        double totalEarnedSalary = dailySalary * daysWorked;
+
+        List<Span> userSpans = spanRepository.findByUsername(user.getUsername());
+        double totalSpansPrice = userSpans.stream()
+                                          .mapToDouble(Span::getPrice)
+                                          .sum();
+
+        double finalAmount = totalEarnedSalary - totalSpansPrice;
+        
+        DecimalFormat df = new DecimalFormat("#.00");
+        String formattedAmount = df.format(finalAmount);
+
+		return new ApiResponse("Final salary calculated", true, formattedAmount);
+	}
+
+	public ApiResponse giveSalary(String username, Double salary, Double givenSalary) {
+		if (salary.equals(givenSalary)) {
+			Optional<User> optionalUser = userRepository.findByUsername(username);
+			if (optionalUser.isPresent()) {
+				User user = optionalUser.get();
+				user.setDateOfEmployment(null);
+				userRepository.save(user);
+
+				List<Span> spans = spanRepository.findByUsername(username);
+				if (!spans.isEmpty()) {
+					spanRepository.deleteAll();
+				}
+				return new ApiResponse("Salary given, date of employment removed and spans deleted", true);
+			} else {
+				return new ApiResponse("User not found", false);
+			}
+		} else {
+			return new ApiResponse("Salary does not match the given salary", false);
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
