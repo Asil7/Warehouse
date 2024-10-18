@@ -30,6 +30,7 @@ public class WarehouseService {
 		Warehouse warehouse = new Warehouse();
 		warehouse.setProduct(warehouseDto.getProduct());
 		warehouse.setQuantity(warehouseDto.getQuantity());
+		warehouse.setType(warehouseDto.getType());
 
 		warehouseRepository.save(warehouse);
 
@@ -50,6 +51,7 @@ public class WarehouseService {
 
 			existingProduct.setProduct(warehouseDto.getProduct());
 			existingProduct.setQuantity(warehouseDto.getQuantity());
+			existingProduct.setType(warehouseDto.getType());
 			warehouseRepository.save(existingProduct);
 
 			return new ApiResponse("Product updated", true);

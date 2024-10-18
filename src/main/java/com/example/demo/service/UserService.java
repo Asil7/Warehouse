@@ -43,6 +43,10 @@ public class UserService {
 	}
 
 	public ApiResponse addUser(UserDto userDto) {
+		
+	    if (userRepository.existsByUsername(userDto.getUsername())) {
+	        return new ApiResponse("Username already exists", false);
+	    }
 
 		Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
 		if (optionalRole.isEmpty()) {
@@ -145,6 +149,10 @@ public class UserService {
         }
 
         User user = optionalUser.get();
+        
+        if(user.getDateOfEmployment() == null) {
+        	return new ApiResponse("Date Of Employment not found", false);
+        }
 
         double dailySalary = user.getSalary() / 30;
 

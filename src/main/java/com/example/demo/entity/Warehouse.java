@@ -20,4 +20,5 @@ public class Warehouse extends AbstractEntity{
 	private String product;
 	@Column(nullable = false)
 	private Long quantity;
+	private String type;
 }

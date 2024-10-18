@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class WarehouseDto {
 	private String product;
 	private Long quantity;
+	private String type;
 }
