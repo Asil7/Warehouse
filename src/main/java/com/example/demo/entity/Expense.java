@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Span extends AbstractEntity {
+public class Expense extends AbstractEntity {
 	@Column(nullable = false)
 	private String reason;
 	@Column(nullable = false)

@@ -14,12 +14,12 @@ import com.example.demo.dto.user.UserDto;
 import com.example.demo.dto.user.UserEditDto;
 import com.example.demo.dto.user.UserProjection;
 import com.example.demo.entity.Role;
-import com.example.demo.entity.Span;
+import com.example.demo.entity.Expense;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.Status;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.repository.RoleRepository;
-import com.example.demo.repository.SpanRepository;
+import com.example.demo.repository.ExpenseRepository;
 import com.example.demo.repository.UserRepository;
 
 @Service
@@ -35,7 +35,7 @@ public class UserService {
 	PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	SpanRepository spanRepository;
+	ExpenseRepository expenseRepository;
 
 	public ApiResponse getAllUsers() {
 		List<UserProjection> userList = userRepository.getAllUsers();
@@ -163,12 +163,12 @@ public class UserService {
 
         double totalEarnedSalary = dailySalary * daysWorked;
 
-        List<Span> userSpans = spanRepository.findByUsername(user.getUsername());
-        double totalSpansPrice = userSpans.stream()
-                                          .mapToDouble(Span::getPrice)
+        List<Expense> userExpenses = expenseRepository.findByUsername(user.getUsername());
+        double totalExpensesPrice = userExpenses.stream()
+                                          .mapToDouble(Expense::getPrice)
                                           .sum();
 
-        double finalAmount = totalEarnedSalary - totalSpansPrice;
+        double finalAmount = totalEarnedSalary - totalExpensesPrice;
         
         DecimalFormat df = new DecimalFormat("#.00");
         String formattedAmount = df.format(finalAmount);
@@ -184,11 +184,11 @@ public class UserService {
 				user.setDateOfEmployment(null);
 				userRepository.save(user);
 
-				List<Span> spans = spanRepository.findByUsername(username);
-				if (!spans.isEmpty()) {
-					spanRepository.deleteAll();
+				List<Expense> expenses = expenseRepository.findByUsername(username);
+				if (!expenses.isEmpty()) {
+					expenseRepository.deleteAll();
 				}
-				return new ApiResponse("Salary given, date of employment removed and spans deleted", true);
+				return new ApiResponse("Salary given", true);
 			} else {
 				return new ApiResponse("User not found", false);
 			}

@@ -1,4 +1,4 @@
-package com.example.demo.dto.span;
+package com.example.demo.dto.expense;
 
 import java.time.LocalDate;
 
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SpanDto {
+public class ExpenseDto {
 	String reason;
 	Double price;
 	String username;

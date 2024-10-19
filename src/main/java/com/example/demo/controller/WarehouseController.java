@@ -55,15 +55,15 @@ public class WarehouseController {
 	}
 	
 	@PreAuthorize("hasAuthority('ADD_QUANTITY')")
-	@PutMapping("/addQuantity/{id}")
-	public HttpEntity<?> addQuantity(@Valid @PathVariable Long id, @RequestBody Long quantity) {
+	@PutMapping("/addQuantity/{id}/{quantity}")
+	public HttpEntity<?> addQuantity(@Valid @PathVariable Long id, @PathVariable Long quantity) {
 		ApiResponse apiResponse = warehouseService.addQauntity(id, quantity);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
 	@PreAuthorize("hasAuthority('SUBTRACT_QUANTITY')")
-	@PutMapping("/subtractQuantity/{id}")
-	public HttpEntity<?> subtractQuantity(@Valid @PathVariable Long id, @RequestBody Long quantity) {
+	@PutMapping("/subtractQuantity/{id}/{quantity}")
+	public HttpEntity<?> subtractQuantity(@Valid @PathVariable Long id, @PathVariable Long quantity) {
 		ApiResponse apiResponse = warehouseService.subtractQuantity(id, quantity);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
