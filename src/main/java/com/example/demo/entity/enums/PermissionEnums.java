@@ -54,6 +54,9 @@ public enum PermissionEnums {
 	DELETE_WAREHOUSE_PRODUCT,
 	ADD_QUANTITY,
 	SUBTRACT_QUANTITY,
+			
+	//ORDER
+	ADD_ORDER,
 }
 
 
