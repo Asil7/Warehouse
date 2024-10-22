@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class OrderProduct extends AbstractEntity {
 
     @Column(nullable = false)
-    private String name;
+    private String product;
 
     @Column(nullable = false)
     private Long quantity;

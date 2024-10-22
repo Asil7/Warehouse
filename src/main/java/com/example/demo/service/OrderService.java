@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.order.OrderDto;
+import com.example.demo.dto.order.OrderProjection;
 import com.example.demo.entity.Company;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderProduct;
@@ -40,7 +41,7 @@ public class OrderService {
 
         List<OrderProduct> productList = orderDto.getProductList().stream().map(dto -> {
             OrderProduct orderProduct = new OrderProduct();
-            orderProduct.setName(dto.getName());
+            orderProduct.setProduct(dto.getProduct());
             orderProduct.setQuantity(dto.getQuantity());
             orderProduct.setType(dto.getType());
             return orderProduct;
@@ -61,4 +62,102 @@ public class OrderService {
                 .mapToDouble(OrderProduct::getQuantity)
                 .sum();
     }
+    
+	public ApiResponse getAllOrders() {
+		List<OrderProjection> findAllOrders = orderRepository.findAllOrders();
+		return new ApiResponse("Order List", true, findAllOrders);
+	}
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
