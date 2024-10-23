@@ -1,9 +1,12 @@
 package com.example.demo.entity;
 
 import com.example.demo.entity.template.AbstractEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +25,10 @@ public class OrderProduct extends AbstractEntity {
     @Column(nullable = false)
     private Long quantity;
 
-    // @Column(nullable = false)
     private String type; 
+    
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
+    private Order order;
 }
