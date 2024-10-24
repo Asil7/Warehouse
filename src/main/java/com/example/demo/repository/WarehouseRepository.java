@@ -11,4 +11,6 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
 	boolean existsByProductAndIdNot(String product, Long id);
 
 	Optional<Warehouse> findByProduct(String product);
+	
+	Optional<Warehouse> findByProductAndType(String product, String type);
 }

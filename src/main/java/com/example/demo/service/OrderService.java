@@ -12,10 +12,12 @@ import com.example.demo.dto.order.OrderProjection;
 import com.example.demo.entity.Company;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderProduct;
+import com.example.demo.entity.Warehouse;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.repository.CompanyRepository;
 import com.example.demo.repository.OrderProductRepository;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.WarehouseRepository;
 
 @Service
 public class OrderService {
@@ -29,6 +31,9 @@ public class OrderService {
 	@Autowired
 	OrderProductRepository orderProductRepository;
 
+	@Autowired
+	WarehouseRepository warehouseRepository;
+
 	public ApiResponse createOrder(OrderDto orderDto) {
 		Company company = companyRepository.findById(orderDto.getCompanyId())
 				.orElseThrow(() -> new IllegalArgumentException("Company not found"));
@@ -39,6 +44,12 @@ public class OrderService {
 		order.setCompany(company);
 
 		List<OrderProduct> productList = orderDto.getProductList().stream().map(dto -> {
+			Warehouse warehouseProduct = warehouseRepository.findByProductAndType(dto.getProduct(), dto.getType())
+					.orElseThrow(() -> new IllegalArgumentException("Product not found in the warehouse"));
+
+			warehouseProduct.setQuantity(warehouseProduct.getQuantity() - dto.getQuantity());
+			warehouseRepository.save(warehouseProduct);
+
 			OrderProduct orderProduct = new OrderProduct();
 			orderProduct.setProduct(dto.getProduct());
 			orderProduct.setQuantity(dto.getQuantity());
@@ -66,9 +77,9 @@ public class OrderService {
 		List<OrderProjection> findAllOrders = orderRepository.findAllOrders();
 		return new ApiResponse("Order List", true, findAllOrders);
 	}
-	
+
 	public ApiResponse getOrderById(Long id) {
-		OrderProjection orderById = orderRepository.findOrderById(id);		
+		OrderProjection orderById = orderRepository.findOrderById(id);
 		return new ApiResponse("Order by id", true, orderById);
 	}
 
@@ -76,22 +87,21 @@ public class OrderService {
 		List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
 		return new ApiResponse("Order Products List", true, orderProducts);
 	}
-	
+
 	public ApiResponse deleteOrder(Long orderId) {
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-        if (!optionalOrder.isPresent()) {
-            return new ApiResponse("Order not found", false);
-        }
+		Optional<Order> optionalOrder = orderRepository.findById(orderId);
+		if (!optionalOrder.isPresent()) {
+			return new ApiResponse("Order not found", false);
+		}
 
-        List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
-        if (!orderProducts.isEmpty()) {
-            orderProductRepository.deleteAll(orderProducts);
-        }
+		List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
+		if (!orderProducts.isEmpty()) {
+			orderProductRepository.deleteAll(orderProducts);
+		}
 
-        orderRepository.deleteById(orderId);
+		orderRepository.deleteById(orderId);
 
-        return new ApiResponse("Order deleted", true);
-    }
-
+		return new ApiResponse("Order deleted", true);
+	}
 
 }
