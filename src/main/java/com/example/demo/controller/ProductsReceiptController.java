@@ -20,7 +20,7 @@ public class ProductsReceiptController {
     @Autowired
     ProductsReceiptService productsReceiptService;
 
-    @PostMapping("/create")
+    @PostMapping
     public HttpEntity<?> createProductsReceipt(@RequestBody ProductsReceiptDto productsReceiptDto) {
         ApiResponse apiResponse = productsReceiptService.createProductsReceipt(productsReceiptDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
