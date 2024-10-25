@@ -46,6 +46,44 @@ public class ProductsReceiptService {
 
         return new ApiResponse("ProductsReceipt created", true);
     }
+    
+    public ApiResponse updateReceivedProduct(Long id, ProductsReceiptDto productsReceiptDto) {
+        Optional<ProductsReceipt> existingProductsReceiptOpt = productsReceiptRepository.findById(id);
+        
+        if (!existingProductsReceiptOpt.isPresent()) {
+            return new ApiResponse("ProductsReceipt not found", false);
+        }
+
+        ProductsReceipt existingProductsReceipt = existingProductsReceiptOpt.get();
+        
+        // Calculate the quantity difference
+        Long quantityDifference = productsReceiptDto.getQuantity() - existingProductsReceipt.getQuantity();
+
+        // Update the ProductsReceipt
+        existingProductsReceipt.setProduct(productsReceiptDto.getProduct());
+        existingProductsReceipt.setQuantity(productsReceiptDto.getQuantity());
+        existingProductsReceipt.setType(productsReceiptDto.getType());
+        productsReceiptRepository.save(existingProductsReceipt);
+
+        // Update the Warehouse
+        Optional<Warehouse> existingWarehouseProductOpt = warehouseRepository.findByProduct(productsReceiptDto.getProduct());
+        
+        if (existingWarehouseProductOpt.isPresent()) {
+            Warehouse warehouse = existingWarehouseProductOpt.get();
+            warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
+            warehouseRepository.save(warehouse);
+        } else {
+            // If the product does not exist in the warehouse, add a new entry
+            Warehouse newWarehouseProduct = new Warehouse(
+                    productsReceiptDto.getProduct(),
+                    productsReceiptDto.getQuantity(),
+                    productsReceiptDto.getType());
+            warehouseRepository.save(newWarehouseProduct);
+        }
+
+        return new ApiResponse("Products Receipt updated", true);
+    }
+
 
     public ApiResponse getAllReceivedProducts() {
         List<ProductsReceipt> receivedProductsList = productsReceiptRepository.findAll();

@@ -44,12 +44,6 @@ public class OrderService {
 		order.setCompany(company);
 
 		List<OrderProduct> productList = orderDto.getProductList().stream().map(dto -> {
-			Warehouse warehouseProduct = warehouseRepository.findByProductAndType(dto.getProduct(), dto.getType())
-					.orElseThrow(() -> new IllegalArgumentException("Product not found in the warehouse"));
-
-			warehouseProduct.setQuantity(warehouseProduct.getQuantity() - dto.getQuantity());
-			warehouseRepository.save(warehouseProduct);
-
 			OrderProduct orderProduct = new OrderProduct();
 			orderProduct.setProduct(dto.getProduct());
 			orderProduct.setQuantity(dto.getQuantity());
@@ -61,6 +55,15 @@ public class OrderService {
 		double totalWeight = calculateTotalWeight(productList);
 		order.setTotalWeight(totalWeight);
 		order.setProductList(productList);
+
+		for (OrderProduct orderProduct : productList) {
+			Warehouse warehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct())
+					.orElseThrow(() -> new IllegalArgumentException(
+							"Product " + orderProduct.getProduct() + " not found in warehouse"));
+
+			warehouseProduct.setQuantity(warehouseProduct.getQuantity() - orderProduct.getQuantity());
+			warehouseRepository.save(warehouseProduct);
+		}
 
 		orderRepository.save(order);
 
