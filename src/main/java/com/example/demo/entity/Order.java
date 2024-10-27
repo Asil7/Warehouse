@@ -1,8 +1,10 @@
 package com.example.demo.entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -15,7 +17,7 @@ import com.example.demo.entity.template.AbstractEntity;
 @NoArgsConstructor
 @Entity(name = "orders")
 public class Order extends AbstractEntity {
-	@Column(nullable = false)
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)
@@ -30,6 +32,7 @@ public class Order extends AbstractEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
+    @ToString.Exclude
     private List<OrderProduct> productList;
 
 }

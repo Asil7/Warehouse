@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -25,10 +26,11 @@ public class OrderProduct extends AbstractEntity {
     @Column(nullable = false)
     private Long quantity;
 
-    private String type; 
-    
+    private String type;
+
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     @JsonIgnore
+    @ToString.Exclude
     private Order order;
 }
