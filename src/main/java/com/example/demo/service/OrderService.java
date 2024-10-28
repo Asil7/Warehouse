@@ -51,10 +51,13 @@ public class OrderService {
 			orderProduct.setOrder(order);
 			return orderProduct;
 		}).collect(Collectors.toList());
-
-		double totalWeight = calculateTotalWeight(productList);
-		order.setTotalWeight(totalWeight);
+		
 		order.setProductList(productList);
+		orderRepository.save(order);
+		
+		double totalWeight = orderProductRepository.findTotalQuantityByOrderId(order.getId());
+		order.setTotalWeight(totalWeight);
+		
 
 		for (OrderProduct orderProduct : productList) {
 			Warehouse warehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct())
@@ -65,16 +68,9 @@ public class OrderService {
 			warehouseRepository.save(warehouseProduct);
 		}
 
-		orderRepository.save(order);
-
 		return new ApiResponse("Order created successfully", true, order);
 	}
 
-	private double calculateTotalWeight(List<OrderProduct> productList) {
-		return productList.stream()
-				.filter(product -> product.getType().equalsIgnoreCase("kg") || product.getType().equalsIgnoreCase("l"))
-				.mapToDouble(OrderProduct::getQuantity).sum();
-	}
 
 	public ApiResponse getAllOrders() {
 		List<OrderProjection> findAllOrders = orderRepository.findAllOrders();
@@ -99,6 +95,20 @@ public class OrderService {
 
 		List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
 		if (!orderProducts.isEmpty()) {
+			
+			for(OrderProduct orderProduct : orderProducts) {
+				Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct());
+				
+				if(existingWarehouseProduct.isEmpty()) {
+					return new ApiResponse("Product " + orderProduct.getProduct() + "not found in warehouse", false);
+				}
+				
+				Warehouse warehouseProduct = existingWarehouseProduct.get();
+				
+				warehouseProduct.setQuantity(warehouseProduct.getQuantity() + orderProduct.getQuantity());
+				warehouseRepository.save(warehouseProduct);
+				
+			}
 			orderProductRepository.deleteAll(orderProducts);
 		}
 

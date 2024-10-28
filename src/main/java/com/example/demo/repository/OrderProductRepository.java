@@ -17,5 +17,12 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
 
 	@Query(value = "SELECT * FROM order_products WHERE id = :id", nativeQuery = true)
 	Optional<OrderProduct> findById(Long id);
+	
+	  @Query(value = "SELECT COALESCE(SUM(op.quantity), 0) " +
+              "FROM order_products op " +
+              "WHERE op.order_id = :orderId " +
+              "AND (op.type = 'kg' OR op.type = 'l')", 
+      nativeQuery = true)
+	  double findTotalQuantityByOrderId(Long orderId);
 
 }
