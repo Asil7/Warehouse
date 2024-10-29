@@ -57,6 +57,8 @@ public enum PermissionEnums {
 			
 	//ORDER
 	ADD_ORDER,
+	
+	PRINT_ORDER
 }
 
 
