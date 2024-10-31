@@ -16,78 +16,67 @@ import com.example.demo.repository.WarehouseRepository;
 @Service
 public class ProductsReceiptService {
 
-    @Autowired
-    ProductsReceiptRepository productsReceiptRepository;
+	@Autowired
+	ProductsReceiptRepository productsReceiptRepository;
 
-    @Autowired
-    WarehouseRepository warehouseRepository;
+	@Autowired
+	WarehouseRepository warehouseRepository;
 
-    public ApiResponse createProductsReceipt(ProductsReceiptDto productsReceiptDto) {
-        Optional<Warehouse> existingWarehouseProduct = warehouseRepository
-                .findByProduct(productsReceiptDto.getProduct());
+	public ApiResponse createProductsReceipt(ProductsReceiptDto productsReceiptDto) {
+		Optional<Warehouse> existingWarehouseProduct = warehouseRepository
+				.findByProduct(productsReceiptDto.getProduct());
 
-        if (existingWarehouseProduct.isPresent()) {
-            Warehouse warehouse = existingWarehouseProduct.get();
-            warehouse.setQuantity(warehouse.getQuantity() + productsReceiptDto.getQuantity());
-            warehouseRepository.save(warehouse);
-        } else {
-            Warehouse newWarehouseProduct = new Warehouse(
-                    productsReceiptDto.getProduct(),
-                    productsReceiptDto.getQuantity(),
-                    productsReceiptDto.getType());
-            warehouseRepository.save(newWarehouseProduct);
-        }
+		if (existingWarehouseProduct.isPresent()) {
+			Warehouse warehouse = existingWarehouseProduct.get();
+			warehouse.setQuantity(warehouse.getQuantity() + productsReceiptDto.getQuantity());
+			warehouseRepository.save(warehouse);
+		} else {
+			Warehouse newWarehouseProduct = new Warehouse(productsReceiptDto.getProduct(),
+					productsReceiptDto.getQuantity(), productsReceiptDto.getType());
+			warehouseRepository.save(newWarehouseProduct);
+		}
 
-        ProductsReceipt newProductsReceipt = new ProductsReceipt(
-                productsReceiptDto.getProduct(),
-                productsReceiptDto.getQuantity(),
-                productsReceiptDto.getType());
-        productsReceiptRepository.save(newProductsReceipt);
+		ProductsReceipt newProductsReceipt = new ProductsReceipt(productsReceiptDto.getProduct(),
+				productsReceiptDto.getQuantity(), productsReceiptDto.getType());
+		productsReceiptRepository.save(newProductsReceipt);
 
-        return new ApiResponse("ProductsReceipt created", true);
-    }
-    
-    public ApiResponse updateReceivedProduct(Long id, ProductsReceiptDto productsReceiptDto) {
-        Optional<ProductsReceipt> existingProductsReceiptOpt = productsReceiptRepository.findById(id);
-        
-        if (!existingProductsReceiptOpt.isPresent()) {
-            return new ApiResponse("ProductsReceipt not found", false);
-        }
+		return new ApiResponse("Product added", true);
+	}
 
-        ProductsReceipt existingProductsReceipt = existingProductsReceiptOpt.get();
-        
-        // Calculate the quantity difference
-        Long quantityDifference = productsReceiptDto.getQuantity() - existingProductsReceipt.getQuantity();
+	public ApiResponse updateReceivedProduct(Long id, ProductsReceiptDto productsReceiptDto) {
+		Optional<ProductsReceipt> existingProductsReceiptOpt = productsReceiptRepository.findById(id);
 
-        // Update the ProductsReceipt
-        existingProductsReceipt.setProduct(productsReceiptDto.getProduct());
-        existingProductsReceipt.setQuantity(productsReceiptDto.getQuantity());
-        existingProductsReceipt.setType(productsReceiptDto.getType());
-        productsReceiptRepository.save(existingProductsReceipt);
+		if (!existingProductsReceiptOpt.isPresent()) {
+			return new ApiResponse("ProductsReceipt not found", false);
+		}
 
-        // Update the Warehouse
-        Optional<Warehouse> existingWarehouseProductOpt = warehouseRepository.findByProduct(productsReceiptDto.getProduct());
-        
-        if (existingWarehouseProductOpt.isPresent()) {
-            Warehouse warehouse = existingWarehouseProductOpt.get();
-            warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
-            warehouseRepository.save(warehouse);
-        } else {
-            // If the product does not exist in the warehouse, add a new entry
-            Warehouse newWarehouseProduct = new Warehouse(
-                    productsReceiptDto.getProduct(),
-                    productsReceiptDto.getQuantity(),
-                    productsReceiptDto.getType());
-            warehouseRepository.save(newWarehouseProduct);
-        }
+		ProductsReceipt existingProductsReceipt = existingProductsReceiptOpt.get();
 
-        return new ApiResponse("Products Receipt updated", true);
-    }
+		// Calculate the quantity difference
+		Long quantityDifference = productsReceiptDto.getQuantity() - existingProductsReceipt.getQuantity();
 
+		// Update the ProductsReceipt
+		existingProductsReceipt.setProduct(productsReceiptDto.getProduct());
+		existingProductsReceipt.setQuantity(productsReceiptDto.getQuantity());
+		existingProductsReceipt.setType(productsReceiptDto.getType());
+		productsReceiptRepository.save(existingProductsReceipt);
 
-    public ApiResponse getAllReceivedProducts() {
-        List<ProductsReceipt> receivedProductsList = productsReceiptRepository.findAll();
-        return new ApiResponse("Received Products List", true, receivedProductsList);
-    }
+		// Update the Warehouse
+		Optional<Warehouse> existingWarehouseProductOpt = warehouseRepository
+				.findByProduct(productsReceiptDto.getProduct());
+
+		if (existingWarehouseProductOpt.isPresent()) {
+			Warehouse warehouse = existingWarehouseProductOpt.get();
+			warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
+			warehouseRepository.save(warehouse);
+		}
+
+		return new ApiResponse("Products Receipt updated", true);
+	}
+
+	public ApiResponse getAllReceivedProducts() {
+		List<ProductsReceipt> receivedProductsList = productsReceiptRepository.findAll();
+		return new ApiResponse("Received Products List", true, receivedProductsList);
+	}
 
 }
