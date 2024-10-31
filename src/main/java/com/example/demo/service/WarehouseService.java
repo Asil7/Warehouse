@@ -61,7 +61,7 @@ public class WarehouseService {
 	}
 	
 	public ApiResponse getAllProducts() {
-		List<Warehouse> productList = warehouseRepository.findAll();
+		List<Warehouse> productList = warehouseRepository.findAllByOrderByCreatedAtDesc();
 		return new ApiResponse("Product List", true, productList);
 	}
 
