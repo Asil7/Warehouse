@@ -52,16 +52,13 @@ public class ProductsReceiptService {
 
 		ProductsReceipt existingProductsReceipt = existingProductsReceiptOpt.get();
 
-		// Calculate the quantity difference
 		Long quantityDifference = productsReceiptDto.getQuantity() - existingProductsReceipt.getQuantity();
 
-		// Update the ProductsReceipt
 		existingProductsReceipt.setProduct(productsReceiptDto.getProduct());
 		existingProductsReceipt.setQuantity(productsReceiptDto.getQuantity());
 		existingProductsReceipt.setType(productsReceiptDto.getType());
 		productsReceiptRepository.save(existingProductsReceipt);
 
-		// Update the Warehouse
 		Optional<Warehouse> existingWarehouseProductOpt = warehouseRepository
 				.findByProduct(productsReceiptDto.getProduct());
 
@@ -72,6 +69,32 @@ public class ProductsReceiptService {
 		}
 
 		return new ApiResponse("Products Receipt updated", true);
+	}
+
+	public ApiResponse deleteProduct(Long id) {
+		Optional<ProductsReceipt> productById = productsReceiptRepository.findById(id);
+
+		if (productById.isEmpty()) {
+			return new ApiResponse("Product not found", false);
+		}
+
+		ProductsReceipt productsReceipt = productById.get();
+
+		Optional<Warehouse> warehouseProduct = warehouseRepository.findByProduct(productsReceipt.getProduct());
+
+		if (warehouseProduct.isEmpty()) {
+			return new ApiResponse("Product not found", false);
+		}
+
+		Warehouse warehouse = warehouseProduct.get();
+
+		warehouse.setQuantity(warehouse.getQuantity() - productsReceipt.getQuantity());
+
+		warehouseRepository.save(warehouse);
+
+		productsReceiptRepository.delete(productsReceipt);
+
+		return new ApiResponse("Product deleted", true);
 	}
 
 	public ApiResponse getAllReceivedProducts() {

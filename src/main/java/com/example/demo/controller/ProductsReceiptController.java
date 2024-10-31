@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,9 +28,10 @@ public class ProductsReceiptController {
         ApiResponse apiResponse = productsReceiptService.createProductsReceipt(productsReceiptDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    
+
     @PutMapping("/{id}")
-    public HttpEntity<?> updateReceivedProduct(@PathVariable Long id, @RequestBody ProductsReceiptDto productsReceiptDto) {
+    public HttpEntity<?> updateReceivedProduct(@PathVariable Long id,
+            @RequestBody ProductsReceiptDto productsReceiptDto) {
         ApiResponse apiResponse = productsReceiptService.updateReceivedProduct(id, productsReceiptDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -37,6 +39,12 @@ public class ProductsReceiptController {
     @GetMapping
     public HttpEntity<?> getReceivedProducts() {
         ApiResponse apiResponse = productsReceiptService.getAllReceivedProducts();
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public HttpEntity<?> deleteProduct(@PathVariable Long id) {
+        ApiResponse apiResponse = productsReceiptService.deleteProduct(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
