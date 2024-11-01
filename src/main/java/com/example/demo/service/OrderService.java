@@ -123,5 +123,18 @@ public class OrderService {
 
 		return new ApiResponse("Order deleted", true);
 	}
+	
+	public ApiResponse updateOrderDeliveredStatus(Long id, boolean delivered) {
+		Optional<Order> optionalOrder = orderRepository.findById(id);
+		if(optionalOrder.isEmpty()) {
+			return new ApiResponse("Order not found", false);
+		} 
+		
+		Order order = optionalOrder.get();
+		order.setDelivered(delivered);
+		orderRepository.save(order);
+		
+		return new ApiResponse("Order delivery status updated", true, order);
+	}
 
 }
