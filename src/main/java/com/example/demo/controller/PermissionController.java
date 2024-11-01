@@ -34,7 +34,7 @@ public class PermissionController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_PERMISSION')")
+//	@PreAuthorize("hasAuthority('EDIT_PERMISSION')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> editPermission(@Valid @PathVariable Long id, @RequestBody PermissionDto permissionDto) {
 		ApiResponse apiResponse = permissionService.editPermission(id, permissionDto);
@@ -48,7 +48,7 @@ public class PermissionController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('DELETE_PERMISSION')")
+//	@PreAuthorize("hasAuthority('DELETE_PERMISSION')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deletePermission(@PathVariable Long id) {
 		ApiResponse apiResponse = permissionService.deletePermission(id);

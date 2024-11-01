@@ -33,7 +33,7 @@ public class ExpenseController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_EXPENSE')")
+//	@PreAuthorize("hasAuthority('EDIT_EXPENSE')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> editExpense(@Valid @PathVariable Long id, @RequestBody ExpenseDto expenseDto) {
 		ApiResponse apiResponse = expenseService.editExpense(id, expenseDto);
@@ -47,14 +47,14 @@ public class ExpenseController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('DELETE_EXPENSE')")
+//	@PreAuthorize("hasAuthority('DELETE_EXPENSE')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deleteExpense(@PathVariable Long id) {
 		ApiResponse apiResponse = expenseService.deleteExpense(id);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('VIEW_EXPENSE_BY_USERNAME')")
+//	@PreAuthorize("hasAuthority('VIEW_EXPENSE_BY_USERNAME')")
 	@GetMapping("/{username}")
 	public HttpEntity<?> getExpenseByUsername(@PathVariable String username) {
 		ApiResponse apiResponse = expenseService.getExpenseByUsername(username);

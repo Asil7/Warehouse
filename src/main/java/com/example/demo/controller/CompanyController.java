@@ -33,7 +33,7 @@ public class CompanyController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('EDIT_COMPANY')")
+//	@PreAuthorize("hasAuthority('EDIT_COMPANY')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> updateCompany(@Valid @PathVariable Long id, @RequestBody CompanyDto companyDto) {
 		ApiResponse apiResponse = companyService.updateCompany(id, companyDto);
@@ -47,14 +47,14 @@ public class CompanyController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('VIEW_COMPANY')")
+//	@PreAuthorize("hasAuthority('VIEW_COMPANY')")
 	@GetMapping("/{id}")
 	public HttpEntity<?> getCompanyById(@PathVariable Long id){
 		ApiResponse apiResponse = companyService.getCompanyById(id);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('DELETE_COMPANY')")
+//	@PreAuthorize("hasAuthority('DELETE_COMPANY')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deleteCompany(@PathVariable Long id){
 		ApiResponse apiResponse = companyService.deleteCompany(id);

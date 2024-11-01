@@ -15,7 +15,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtProvider {
 
-	private static final long expireTime = 1000 * 60 * 60 * 24;
+	private static final long expireTime = 1000L * 60 * 60 * 24 * 30;
 	private static final String key = "warehouse";
 
 public String generateToken(String username, Role role) {

@@ -34,7 +34,7 @@ public class RoleController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_ROLE')")
+//	@PreAuthorize("hasAuthority('EDIT_ROLE')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> editRole(@Valid @PathVariable Long id, @RequestBody EditRoleDto editRoleDto) {
 		ApiResponse apiResponse = roleService.editRole(id, editRoleDto);
@@ -48,42 +48,42 @@ public class RoleController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('VIEW_ROLE')")
+//	@PreAuthorize("hasAuthority('VIEW_ROLE')")
 	@GetMapping("/{id}")
 	public HttpEntity<?> getRoleById(@PathVariable Long id) {
 		ApiResponse apiResponse = roleService.getRoleById(id);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
+//	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
 	@GetMapping("/{roleId}/permissions")
 	public HttpEntity<?> getRolePermissions(@PathVariable Long roleId) {
 		ApiResponse apiResponse = roleService.getRolePermissions(roleId);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
+//	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
 	@GetMapping("/{roleId}/notPermissions")
 	public HttpEntity<?> getPermissionsNotInRole(@PathVariable Long roleId) {
 		ApiResponse apiResponse = roleService.getPermissionsNotInRole(roleId);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('ADD_PERMISSION_TO_ROLE')")
+//	@PreAuthorize("hasAuthority('ADD_PERMISSION_TO_ROLE')")
 	@PutMapping("/addPermission/{roleId}/{permissionId}")
 	public HttpEntity<?> addPermissionToRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
 		ApiResponse apiResponse = roleService.addPermissionToRole(roleId, permissionId);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('DELETE_PERMISSION_FROM_ROLE')")
+//	@PreAuthorize("hasAuthority('DELETE_PERMISSION_FROM_ROLE')")
 	@PutMapping("/deletePermission/{roleId}/{permissionId}")
 	public HttpEntity<?> deletePermissionFromRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
 		ApiResponse apiResponse = roleService.deletePermissionFromRole(roleId, permissionId);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('DELETE_ROLE')")
+//	@PreAuthorize("hasAuthority('DELETE_ROLE')")
 	@DeleteMapping("/{roleId}")
 	public HttpEntity<?> deleteRole(@PathVariable Long roleId) {
 		ApiResponse apiResponse = roleService.deleteRole(roleId);

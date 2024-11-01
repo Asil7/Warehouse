@@ -33,35 +33,35 @@ public class WarehouseController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_WAREHOUSE_PRODUCT')")
+//	@PreAuthorize("hasAuthority('EDIT_WAREHOUSE_PRODUCT')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> editProduct(@Valid @PathVariable Long id, @RequestBody WarehouseDto warehouseDto) {
 		ApiResponse apiResponse = warehouseService.editProduct(id, warehouseDto);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('VIEW_WAREHOUSE_PRODUCT_LIST')")
+//	@PreAuthorize("hasAuthority('VIEW_WAREHOUSE_PRODUCT_LIST')")
 	@GetMapping
 	public HttpEntity<?> getProduct() {
 		ApiResponse apiResponse = warehouseService.getAllProducts();
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('DELETE_WAREHOUSE_PRODUCT')")
+//	@PreAuthorize("hasAuthority('DELETE_WAREHOUSE_PRODUCT')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deleteProduct(@PathVariable Long id) {
 		ApiResponse apiResponse = warehouseService.deleteProduct(id);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('ADD_QUANTITY')")
+//	@PreAuthorize("hasAuthority('ADD_QUANTITY')")
 	@PutMapping("/addQuantity/{id}/{quantity}")
 	public HttpEntity<?> addQuantity(@Valid @PathVariable Long id, @PathVariable Long quantity) {
 		ApiResponse apiResponse = warehouseService.addQauntity(id, quantity);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('SUBTRACT_QUANTITY')")
+//	@PreAuthorize("hasAuthority('SUBTRACT_QUANTITY')")
 	@PutMapping("/subtractQuantity/{id}/{quantity}")
 	public HttpEntity<?> subtractQuantity(@Valid @PathVariable Long id, @PathVariable Long quantity) {
 		ApiResponse apiResponse = warehouseService.subtractQuantity(id, quantity);

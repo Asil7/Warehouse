@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ public class StoreController {
     @Autowired
     StoreService storeService;
 
+    @PreAuthorize("hasAuthority('ADD_STORE_PRODUCT')")
     @PostMapping
     public HttpEntity<?> createStoreProduct(@RequestBody StoreDto storeDto) {
         ApiResponse apiResponse = storeService.createStoreProduct(storeDto);
@@ -35,6 +37,7 @@ public class StoreController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @PreAuthorize("hasAuthority('VIEW_STORE_PRODUCT_LIST')")
     @GetMapping
     public HttpEntity<?> getStoreProducts() {
         ApiResponse apiResponse = storeService.getAllStoreProducts();

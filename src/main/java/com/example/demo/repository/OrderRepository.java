@@ -14,6 +14,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 			+ "c.phone AS phone, " + "o.delivered AS delivered, " + "o.created_at AS createdAt " + "FROM orders o "
 			+ "JOIN companies c ON o.company_id = c.id", nativeQuery = true)
 	List<OrderProjection> findAllOrders();
+	
+	@Query(value = "SELECT " +
+            "o.id AS id, " +
+            "c.name AS company, " +
+            "o.username AS username, " +
+            "c.location AS location, " +
+            "c.location_map AS locationMap, " +
+            "o.total_weight AS totalWeight, " +
+            "c.phone AS phone, " +
+            "o.delivered AS delivered, " +
+            "o.created_at AS createdAt " +
+            "FROM orders o " +
+            "JOIN companies c ON o.company_id = c.id " +
+            "WHERE o.username = :username", nativeQuery = true)
+    List<OrderProjection> findOrdersByUsername(String username);
 
 	@Query(value = "SELECT " + "o.id AS id, " + "c.name AS company, " + "o.username AS username, "
 			+ "c.location AS location, " + "c.location_map AS locationMap, " + "o.total_weight AS totalWeight, "

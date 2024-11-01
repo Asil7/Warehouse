@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ public class OrderProductController {
     @Autowired
     OrderProductService orderProductService;
 
+    @PreAuthorize("hasAuthority('ADD_ORDER_PRODUCT')")
     @PostMapping("/{id}")
     public HttpEntity<?> createOrderProduct(@PathVariable Long id, @RequestBody CreateOrderProductRequest request){
     	ApiResponse apiResponse = orderProductService.createOrderProduct(id, request.getProductList());

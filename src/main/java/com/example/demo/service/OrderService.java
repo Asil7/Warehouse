@@ -51,13 +51,12 @@ public class OrderService {
 			orderProduct.setOrder(order);
 			return orderProduct;
 		}).collect(Collectors.toList());
-		
+
 		order.setProductList(productList);
 		orderRepository.save(order);
-		
+
 		double totalWeight = orderProductRepository.findTotalQuantityByOrderId(order.getId());
 		order.setTotalWeight(totalWeight);
-		
 
 		for (OrderProduct orderProduct : productList) {
 			Warehouse warehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct())
@@ -71,10 +70,17 @@ public class OrderService {
 		return new ApiResponse("Order created successfully", true, order);
 	}
 
-
 	public ApiResponse getAllOrders() {
 		List<OrderProjection> findAllOrders = orderRepository.findAllOrders();
 		return new ApiResponse("Order List", true, findAllOrders);
+	}
+
+	public ApiResponse getOrdersByUsername(String username) {
+		List<OrderProjection> orders = orderRepository.findOrdersByUsername(username);
+		if (orders.isEmpty()) {
+			return new ApiResponse("No orders found for username: " + username, true, orders);
+		}
+		return new ApiResponse("Orders for username: " + username, true, orders);
 	}
 
 	public ApiResponse getOrderById(Long id) {
@@ -95,19 +101,20 @@ public class OrderService {
 
 		List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
 		if (!orderProducts.isEmpty()) {
-			
-			for(OrderProduct orderProduct : orderProducts) {
-				Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct());
-				
-				if(existingWarehouseProduct.isEmpty()) {
+
+			for (OrderProduct orderProduct : orderProducts) {
+				Optional<Warehouse> existingWarehouseProduct = warehouseRepository
+						.findByProduct(orderProduct.getProduct());
+
+				if (existingWarehouseProduct.isEmpty()) {
 					return new ApiResponse("Product " + orderProduct.getProduct() + "not found in warehouse", false);
 				}
-				
+
 				Warehouse warehouseProduct = existingWarehouseProduct.get();
-				
+
 				warehouseProduct.setQuantity(warehouseProduct.getQuantity() + orderProduct.getQuantity());
 				warehouseRepository.save(warehouseProduct);
-				
+
 			}
 			orderProductRepository.deleteAll(orderProducts);
 		}

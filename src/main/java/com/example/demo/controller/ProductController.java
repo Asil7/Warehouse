@@ -32,7 +32,7 @@ public class ProductController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_PRODUCT')")
+//	@PreAuthorize("hasAuthority('EDIT_PRODUCT')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> editProduct(@Valid @PathVariable Long id, @RequestBody ProductDto productDto) {
 		ApiResponse apiResponse = productService.editProduct(id, productDto);
@@ -46,7 +46,7 @@ public class ProductController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('DELETE_PRODUCT')")
+//	@PreAuthorize("hasAuthority('DELETE_PRODUCT')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deleteProduct(@PathVariable Long id) {
 		ApiResponse apiResponse = productService.deleteProduct(id);

@@ -38,7 +38,7 @@ public class UserController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('VIEW_USER')")
+//	@PreAuthorize("hasAuthority('VIEW_USER')")
 	@GetMapping("/{id}")
 	public HttpEntity<?> getUserById(@PathVariable Long id) {
 		ApiResponse apiResponse = userService.getUserById(id);
@@ -52,28 +52,28 @@ public class UserController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_USER')")
+//	@PreAuthorize("hasAuthority('EDIT_USER')")
 	@PutMapping("/{id}")
 	public HttpEntity<?> editUser(@PathVariable Long id, @RequestBody UserEditDto userEditDto) {
 		ApiResponse apiResponse = userService.editUser(id, userEditDto);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_USER_STATUS')")
+//	@PreAuthorize("hasAuthority('EDIT_USER_STATUS')")
 	@PutMapping("/status/{id}/{status}")
 	public HttpEntity<?> updateStatus(@PathVariable Long id, @PathVariable Status status) {
 		ApiResponse apiResponse = userService.updateStatus(id, status);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-	@PreAuthorize("hasAuthority('EDIT_USER_PASSWORD')")
+//	@PreAuthorize("hasAuthority('EDIT_USER_PASSWORD')")
 	@PutMapping("/password/{id}")
 	public HttpEntity<?> updateStatus(@PathVariable Long id, @RequestBody String password) {
 		ApiResponse apiResponse = userService.updatePassword(id, password);
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('DELETE_USER')")
+//	@PreAuthorize("hasAuthority('DELETE_USER')")
 	@DeleteMapping("/{id}")
 	public HttpEntity<?> deleteUser(@PathVariable Long id) {
 		ApiResponse apiResponse = userService.deleteUser(id);
@@ -86,7 +86,7 @@ public class UserController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 	
-	@PreAuthorize("hasAuthority('GIVE_SALARY')")
+//	@PreAuthorize("hasAuthority('GIVE_SALARY')")
 	@PostMapping("/give-salary")
 	public HttpEntity<?> giveSalary(@RequestParam String username, @RequestParam Double salary, Double givenSalary){
 		ApiResponse apiResponse = userService.giveSalary(username, salary, givenSalary);
