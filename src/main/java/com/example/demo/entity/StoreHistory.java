@@ -14,11 +14,13 @@ import com.example.demo.entity.template.AbstractEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Store extends AbstractEntity {
+public class StoreHistory extends AbstractEntity {
     @Column(nullable = false)
     private String product;
     @Column(nullable = false)
     private Long quantity;
     private double price;
     private String type;
+    private boolean received;
+    private boolean paid;
 }

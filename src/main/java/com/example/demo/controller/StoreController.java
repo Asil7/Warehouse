@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.demo.dto.store.StoreDto;
 import com.example.demo.payload.ApiResponse;
-import com.example.demo.service.StoreService;
+import com.example.demo.service.StoreHistoryService;
 
 @RestController
 @RequestMapping("/api/store")
 public class StoreController {
 
     @Autowired
-    StoreService storeService;
+    StoreHistoryService storeService;
 
     @PreAuthorize("hasAuthority('ADD_STORE_PRODUCT')")
     @PostMapping

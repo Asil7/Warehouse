@@ -12,4 +12,6 @@ public class StoreDto {
     private Long quantity;
     private double price;
     private String type;
+    private boolean received;
+    private boolean paid;
 }

@@ -62,7 +62,7 @@ public class RoleController {
 		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 
-//	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
+	@PreAuthorize("hasAuthority('VIEW_ROLE_PERMISSIONS')")
 	@GetMapping("/{roleId}/notPermissions")
 	public HttpEntity<?> getPermissionsNotInRole(@PathVariable Long roleId) {
 		ApiResponse apiResponse = roleService.getPermissionsNotInRole(roleId);

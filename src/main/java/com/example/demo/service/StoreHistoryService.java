@@ -7,17 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.store.StoreDto;
-import com.example.demo.entity.Store;
+import com.example.demo.entity.StoreHistory;
 import com.example.demo.entity.Warehouse;
 import com.example.demo.payload.ApiResponse;
-import com.example.demo.repository.StoreRepository;
+import com.example.demo.repository.StoreHistoryRepository;
 import com.example.demo.repository.WarehouseRepository;
 
 @Service
-public class StoreService {
+public class StoreHistoryService {
 
 	@Autowired
-	StoreRepository storeRepository;
+	StoreHistoryRepository storeRepository;
 
 	@Autowired
 	WarehouseRepository warehouseRepository;
@@ -35,21 +35,21 @@ public class StoreService {
 			warehouseRepository.save(newWarehouseProduct);
 		}
 
-		Store newStore = new Store(storeDto.getProduct(), storeDto.getQuantity(), storeDto.getPrice(),
-				storeDto.getType());
+		StoreHistory newStore = new StoreHistory(storeDto.getProduct(), storeDto.getQuantity(), storeDto.getPrice(),
+				storeDto.getType(), storeDto.isReceived(), storeDto.isPaid());
 		storeRepository.save(newStore);
 
 		return new ApiResponse("Product added", true);
 	}
 
 	public ApiResponse updateStoreProduct(Long id, StoreDto storeDto) {
-		Optional<Store> existingStoreProduct = storeRepository.findById(id);
+		Optional<StoreHistory> existingStoreProduct = storeRepository.findById(id);
 
 		if (!existingStoreProduct.isPresent()) {
 			return new ApiResponse("Store Product not found", false);
 		}
 
-		Store store = existingStoreProduct.get();
+		StoreHistory store = existingStoreProduct.get();
 
 		Long quantityDifference = storeDto.getQuantity() - store.getQuantity();
 
@@ -71,13 +71,13 @@ public class StoreService {
 	}
 
 	public ApiResponse deleteStoreProduct(Long id) {
-		Optional<Store> storeProductById = storeRepository.findById(id);
+		Optional<StoreHistory> storeProductById = storeRepository.findById(id);
 
 		if (storeProductById.isEmpty()) {
 			return new ApiResponse("Product not found", false);
 		}
 
-		Store store = storeProductById.get();
+		StoreHistory store = storeProductById.get();
 
 		Optional<Warehouse> warehouseProduct = warehouseRepository.findByProduct(store.getProduct());
 
@@ -97,7 +97,7 @@ public class StoreService {
 	}
 
 	public ApiResponse getAllStoreProducts() {
-		List<Store> storeProductsList = storeRepository.findAll();
+		List<StoreHistory> storeProductsList = storeRepository.findAll();
 		return new ApiResponse("Store Products List", true, storeProductsList);
 	}
 }
