@@ -32,13 +32,13 @@ public class OrderController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-//    @PreAuthorize("hasAuthority('VIEW_ORDER_LIST')")
+    // @PreAuthorize("hasAuthority('VIEW_ORDER_LIST')")
     @GetMapping
     public HttpEntity<?> getOrderList() {
         ApiResponse apiResponse = orderService.getAllOrders();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    
+
     @PreAuthorize("hasAuthority('VIEW_ORDER_LIST_BY_USER')")
     @GetMapping("/user")
     public HttpEntity<?> getOrderListByUsername(@RequestParam String username) {
@@ -64,10 +64,10 @@ public class OrderController {
         ApiResponse apiResponse = orderService.deleteOrder(orderId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    
+
     @PutMapping("/{id}/delivered")
-    public HttpEntity<?> updateOrderDeliveredStatus (@PathVariable Long id, @RequestParam boolean delivered){
-    	ApiResponse apiResponse = orderService.updateOrderDeliveredStatus(id, delivered);
-    	return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    public HttpEntity<?> updateOrderDeliveredStatus(@PathVariable Long id, @RequestParam boolean delivered) {
+        ApiResponse apiResponse = orderService.updateOrderDeliveredStatus(id, delivered);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
