@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -48,5 +49,11 @@ public class StoreHistoryController {
     public HttpEntity<?> deleteStoreProduct(@PathVariable Long id) {
         ApiResponse apiResponse = storeService.deleteStoreProduct(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+    
+    @PutMapping("/{id}/paid")
+    public HttpEntity<?> updateStoreHistoryPaidStatus(@PathVariable Long id, @RequestParam boolean paid) {
+    	ApiResponse apiResponse = storeService.updateStoreHistoryPaidStatus(id, paid);
+    	return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

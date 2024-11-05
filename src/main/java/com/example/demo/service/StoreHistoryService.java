@@ -97,7 +97,20 @@ public class StoreHistoryService {
 	}
 
 	public ApiResponse getAllStoreProducts() {
-		List<StoreHistory> storeProductsList = storeRepository.findAll();
+		List<StoreHistory> storeProductsList = storeRepository.findAllByCreatedAtDesc();
 		return new ApiResponse("Store Products List", true, storeProductsList);
+	}
+	
+	public ApiResponse updateStoreHistoryPaidStatus(Long id, boolean paid) {
+		Optional<StoreHistory> optionalStoreHistory = storeRepository.findById(id);
+		if (optionalStoreHistory.isEmpty()) {
+			return new ApiResponse("Store product not found", false);
+		}
+
+		StoreHistory storeHistory = optionalStoreHistory.get();
+		storeHistory.setPaid(paid);
+		storeRepository.save(storeHistory);
+
+		return new ApiResponse("Paid", true, storeHistory);
 	}
 }

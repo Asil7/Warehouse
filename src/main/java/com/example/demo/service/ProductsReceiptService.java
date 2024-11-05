@@ -98,7 +98,7 @@ public class ProductsReceiptService {
 	}
 
 	public ApiResponse getAllReceivedProducts() {
-		List<ProductsReceipt> receivedProductsList = productsReceiptRepository.findAll();
+		List<ProductsReceipt> receivedProductsList = productsReceiptRepository.findAllByCreatedAtDesc();
 		return new ApiResponse("Received Products List", true, receivedProductsList);
 	}
 
