@@ -37,7 +37,7 @@ public class ProductsReceiptService {
 		}
 
 		ProductsReceipt newProductsReceipt = new ProductsReceipt(productsReceiptDto.getProduct(),
-				productsReceiptDto.getQuantity(), productsReceiptDto.getType());
+				productsReceiptDto.getQuantity(), productsReceiptDto.getPrice(), productsReceiptDto.getType());
 		productsReceiptRepository.save(newProductsReceipt);
 
 		return new ApiResponse("Product added", true);

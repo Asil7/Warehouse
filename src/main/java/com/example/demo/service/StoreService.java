@@ -8,17 +8,22 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.store.StoreDto;
 import com.example.demo.entity.Store;
+import com.example.demo.entity.Warehouse;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.repository.StoreRepository;
+import com.example.demo.repository.WarehouseRepository;
 
 @Service
 public class StoreService {
 
 	@Autowired
 	StoreRepository storeRepository;
-	
+
 	@Autowired
 	StoreHistoryService storeHistoryService;
+
+	@Autowired
+	WarehouseRepository warehouseRepository;
 
 	public ApiResponse addProduct(StoreDto storeDto) {
 
@@ -39,9 +44,9 @@ public class StoreService {
 
 		return new ApiResponse("Product added", true);
 	}
-	
+
 	public ApiResponse updateProduct(Long id, StoreDto storeDto) {
-		
+
 		Optional<Store> optionalStore = storeRepository.findById(id);
 
 		if (optionalStore.isEmpty()) {
@@ -86,16 +91,47 @@ public class StoreService {
 		Store store = optionalStore.get();
 		store.setReceived(storeDto.isReceived());
 		storeRepository.save(store);
-		
-		ApiResponse createStoreProduct = storeHistoryService.createStoreProduct(storeDto);
-		
-	    if (!createStoreProduct.isSuccess()) {
-	        return new ApiResponse("Store received status updated, but failed to create store history", false);
-	    }
-	    
-	    storeRepository.delete(store);
 
-	    return new ApiResponse("Product received", true, store);
+		ApiResponse createStoreProduct = storeHistoryService.createStoreProduct(storeDto);
+
+		if (!createStoreProduct.isSuccess()) {
+			return new ApiResponse("Store received status updated, but failed to create store history", false);
+		}
+
+		storeRepository.delete(store);
+
+		return new ApiResponse("Product received", true, store);
+	}
+
+	public ApiResponse addProductFromWarehouse() {
+		 List<Warehouse> warehouses = warehouseRepository.findAll();
+
+		    for (Warehouse warehouse : warehouses) {
+		        Optional<Store> existingStoreOpt = storeRepository.findByProduct(warehouse.getProduct());
+
+		        if (warehouse.getQuantity() >= 0) {
+		            existingStoreOpt.ifPresent(storeRepository::delete);
+		        } else {
+		            long positiveQuantity = Math.abs(warehouse.getQuantity());
+
+		            if (existingStoreOpt.isPresent()) {
+		                Store existingStore = existingStoreOpt.get();
+		                existingStore.setQuantity(positiveQuantity);
+		                existingStore.setType(warehouse.getType()); 
+		                storeRepository.save(existingStore);
+		            } else {
+		                Store newStore = new Store();
+		                newStore.setProduct(warehouse.getProduct());
+		                newStore.setQuantity(positiveQuantity);
+		                newStore.setType(warehouse.getType());
+		                newStore.setReceived(false);
+		                newStore.setPaid(false);
+
+		                storeRepository.save(newStore);
+		            }
+		        }
+		    }
+		return new ApiResponse("Success", true);
 	}
 
 }

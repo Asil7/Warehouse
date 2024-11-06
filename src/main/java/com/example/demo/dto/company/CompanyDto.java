@@ -16,6 +16,8 @@ public class CompanyDto {
 	
 	String additionalPhone;
 	
+	String username;
+	
 	String description;
 	
 	String location;

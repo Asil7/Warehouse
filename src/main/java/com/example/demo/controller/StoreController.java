@@ -41,6 +41,12 @@ public class StoreController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     
+    @GetMapping("/warehouse")
+    public HttpEntity<?> addWarehouseProduct() {
+        ApiResponse apiResponse = storeService.addProductFromWarehouse();
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+    
     @PutMapping("/{id}/paid")
     public HttpEntity<?> updateStorePaidStatus(@PathVariable Long id, @RequestParam boolean paid) {
     	ApiResponse apiResponse = storeService.updateStorePaidStatus(id, paid);

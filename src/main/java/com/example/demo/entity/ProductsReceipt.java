@@ -19,5 +19,6 @@ public class ProductsReceipt extends AbstractEntity {
     private String product;
     @Column(nullable = false)
     private Long quantity;
+    private double price;
     private String type;
 }

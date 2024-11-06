@@ -24,6 +24,8 @@ public class Company extends AbstractEntity {
 
 	private String additionalPhone;
 	
+	private String username;
+	
 	private String description;
 	
 	@Column(nullable = false)

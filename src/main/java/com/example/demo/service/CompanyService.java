@@ -27,6 +27,7 @@ public class CompanyService {
 		company.setName(companyDto.getName());
 		company.setPhone(companyDto.getPhone());
 		company.setAdditionalPhone(companyDto.getAdditionalPhone());
+		company.setUsername(companyDto.getUsername());
 		company.setDescription(companyDto.getDescription());
 		company.setLocation(companyDto.getLocation());
 		company.setLocationMap(companyDto.getLocationMap());
@@ -49,6 +50,7 @@ public class CompanyService {
 			existingCompany.setName(companyDto.getName());
 			existingCompany.setPhone(companyDto.getPhone());
 			existingCompany.setAdditionalPhone(companyDto.getAdditionalPhone());
+			existingCompany.setUsername(companyDto.getUsername());
 			existingCompany.setDescription(companyDto.getDescription());
 			existingCompany.setLocation(companyDto.getLocation());
 			existingCompany.setLocationMap(companyDto.getLocationMap());

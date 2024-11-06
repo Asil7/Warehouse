@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class ProductsReceiptDto {
     private String product;
     private Long quantity;
+    private double price;
     private String type;
 }
