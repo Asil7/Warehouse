@@ -3,6 +3,8 @@ package com.example.demo.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import com.example.demo.repository.WarehouseRepository;
 @Service
 public class StoreHistoryService {
 
+	private static final Logger logger = LoggerFactory.getLogger(StoreHistoryService.class);
+
 	@Autowired
 	StoreHistoryRepository storeRepository;
 
@@ -23,94 +27,129 @@ public class StoreHistoryService {
 	WarehouseRepository warehouseRepository;
 
 	public ApiResponse createStoreProduct(StoreDto storeDto) {
-		Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(storeDto.getProduct());
+		try {
+			Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(storeDto.getProduct());
 
-		if (existingWarehouseProduct.isPresent()) {
-			Warehouse warehouse = existingWarehouseProduct.get();
-			warehouse.setQuantity(warehouse.getQuantity() + storeDto.getQuantity());
-			warehouseRepository.save(warehouse);
-		} else {
-			Warehouse newWarehouseProduct = new Warehouse(storeDto.getProduct(), storeDto.getQuantity(),
-					storeDto.getType());
-			warehouseRepository.save(newWarehouseProduct);
+			if (existingWarehouseProduct.isPresent()) {
+				Warehouse warehouse = existingWarehouseProduct.get();
+				warehouse.setQuantity(warehouse.getQuantity() + storeDto.getQuantity());
+				warehouseRepository.save(warehouse);
+				logger.info("Updated warehouse {} product quantity to: {}", warehouse.getProduct(),
+						warehouse.getQuantity());
+			} else {
+				Warehouse newWarehouseProduct = new Warehouse(storeDto.getProduct(), storeDto.getQuantity(),
+						storeDto.getType());
+				warehouseRepository.save(newWarehouseProduct);
+				logger.info("New warehouse product saved with ID: {}", newWarehouseProduct.getId());
+			}
+
+			StoreHistory newStore = new StoreHistory(storeDto.getProduct(), storeDto.getQuantity(), storeDto.getPrice(),
+					storeDto.getType(), storeDto.isReceived(), storeDto.isPaid());
+			storeRepository.save(newStore);
+			logger.info("Store history record saved with ID: {}", newStore.getId());
+
+			return new ApiResponse("Product added", true);
+		} catch (Exception e) {
+			logger.error("Error creating store product: {}", e.getMessage(), e);
+			return new ApiResponse("Error adding product", false);
 		}
-
-		StoreHistory newStore = new StoreHistory(storeDto.getProduct(), storeDto.getQuantity(), storeDto.getPrice(),
-				storeDto.getType(), storeDto.isReceived(), storeDto.isPaid());
-		storeRepository.save(newStore);
-
-		return new ApiResponse("Product added", true);
 	}
 
 	public ApiResponse updateStoreProduct(Long id, StoreDto storeDto) {
-		Optional<StoreHistory> existingStoreProduct = storeRepository.findById(id);
+		try {
+			Optional<StoreHistory> existingStoreProduct = storeRepository.findById(id);
 
-		if (!existingStoreProduct.isPresent()) {
-			return new ApiResponse("Store Product not found", false);
+			if (!existingStoreProduct.isPresent()) {
+				logger.warn("Store product not found with ID: {}", id);
+				return new ApiResponse("Store Product not found", false);
+			}
+
+			StoreHistory store = existingStoreProduct.get();
+			Long quantityDifference = storeDto.getQuantity() - store.getQuantity();
+
+			store.setProduct(storeDto.getProduct());
+			store.setQuantity(storeDto.getQuantity());
+			store.setPrice(storeDto.getPrice());
+			store.setType(storeDto.getType());
+			storeRepository.save(store);
+			logger.info("Updated store product with ID: {}", store.getId());
+
+			Optional<Warehouse> existingWarehouseProductOpt = warehouseRepository.findByProduct(storeDto.getProduct());
+
+			if (existingWarehouseProductOpt.isPresent()) {
+				Warehouse warehouse = existingWarehouseProductOpt.get();
+				warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
+				warehouseRepository.save(warehouse);
+				logger.info("Updated warehouse product quantity to: {}", warehouse.getQuantity());
+			}
+
+			return new ApiResponse("Store Product updated", true);
+		} catch (Exception e) {
+			logger.error("Error updating store product with ID {}: {}", id, e.getMessage(), e);
+			return new ApiResponse("Error updating store product", false);
 		}
-
-		StoreHistory store = existingStoreProduct.get();
-
-		Long quantityDifference = storeDto.getQuantity() - store.getQuantity();
-
-		store.setProduct(storeDto.getProduct());
-		store.setQuantity(storeDto.getQuantity());
-		store.setPrice(storeDto.getPrice());
-		store.setType(storeDto.getType());
-		storeRepository.save(store);
-
-		Optional<Warehouse> existingWarehouseProductOpt = warehouseRepository.findByProduct(storeDto.getProduct());
-
-		if (existingWarehouseProductOpt.isPresent()) {
-			Warehouse warehouse = existingWarehouseProductOpt.get();
-			warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
-			warehouseRepository.save(warehouse);
-		}
-
-		return new ApiResponse("Store Product updated", true);
 	}
 
 	public ApiResponse deleteStoreProduct(Long id) {
-		Optional<StoreHistory> storeProductById = storeRepository.findById(id);
+		try {
+			Optional<StoreHistory> storeProductById = storeRepository.findById(id);
 
-		if (storeProductById.isEmpty()) {
-			return new ApiResponse("Product not found", false);
+			if (storeProductById.isEmpty()) {
+				logger.warn("Store product not found with ID: {}", id);
+				return new ApiResponse("Product not found", false);
+			}
+
+			StoreHistory store = storeProductById.get();
+			Optional<Warehouse> warehouseProduct = warehouseRepository.findByProduct(store.getProduct());
+
+			if (warehouseProduct.isEmpty()) {
+				logger.warn("Warehouse product not found for store product with ID: {}", store.getId());
+				return new ApiResponse("Product not found", false);
+			}
+
+			Warehouse warehouse = warehouseProduct.get();
+			warehouse.setQuantity(warehouse.getQuantity() - store.getQuantity());
+			warehouseRepository.save(warehouse);
+			logger.info("Updated warehouse product quantity after deletion, new quantity: {}", warehouse.getQuantity());
+
+			storeRepository.delete(store);
+			logger.info("Deleted store product with ID: {}", store.getId());
+
+			return new ApiResponse("Store product deleted", true);
+		} catch (Exception e) {
+			logger.error("Error deleting store product with ID {}: {}", id, e.getMessage(), e);
+			return new ApiResponse("Error deleting store product", false);
 		}
-
-		StoreHistory store = storeProductById.get();
-
-		Optional<Warehouse> warehouseProduct = warehouseRepository.findByProduct(store.getProduct());
-
-		if (warehouseProduct.isEmpty()) {
-			return new ApiResponse("Product not found", false);
-		}
-
-		Warehouse warehouse = warehouseProduct.get();
-
-		warehouse.setQuantity(warehouse.getQuantity() - store.getQuantity());
-
-		warehouseRepository.save(warehouse);
-
-		storeRepository.delete(store);
-
-		return new ApiResponse("Store product deleted", true);
 	}
 
 	public ApiResponse getAllStoreProducts() {
-		List<StoreHistory> storeProductsList = storeRepository.findAllByCreatedAtDesc();
-		return new ApiResponse("Store Products List", true, storeProductsList);
-	}
-	
-	public ApiResponse updateStoreHistoryPaidStatus(Long id, boolean paid) {
-		Optional<StoreHistory> optionalStoreHistory = storeRepository.findById(id);
-		if (optionalStoreHistory.isEmpty()) {
-			return new ApiResponse("Store product not found", false);
+		try {
+			List<StoreHistory> storeProductsList = storeRepository.findAllByCreatedAtDesc();
+			logger.info("Get {} store products", storeProductsList.size());
+			return new ApiResponse("Store Products List", true, storeProductsList);
+		} catch (Exception e) {
+			logger.error("Error fetching store products list: {}", e.getMessage(), e);
+			return new ApiResponse("Error fetching store products list", false);
 		}
+	}
 
-		StoreHistory storeHistory = optionalStoreHistory.get();
-		storeHistory.setPaid(paid);
-		storeRepository.save(storeHistory);
+	public ApiResponse updateStoreHistoryPaidStatus(Long id, boolean paid) {
+		try {
+			Optional<StoreHistory> optionalStoreHistory = storeRepository.findById(id);
+			if (optionalStoreHistory.isEmpty()) {
+				logger.warn("Store product not found with ID: {}", id);
+				return new ApiResponse("Store product not found", false);
+			}
 
-		return new ApiResponse("Paid", true, storeHistory);
+			StoreHistory storeHistory = optionalStoreHistory.get();
+			storeHistory.setPaid(paid);
+			storeRepository.save(storeHistory);
+			logger.info("Updated paid status for store product with ID: {} to {}", storeHistory.getId(), paid);
+
+			return new ApiResponse("Paid status updated", true, storeHistory);
+		} catch (Exception e) {
+			logger.error("Error updating paid status for store product with ID {}: {}", id, e.getMessage(), e);
+			return new ApiResponse("Error updating paid status", false);
+		}
 	}
 }
