@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.user.FirebaseTokenRequest;
 import com.example.demo.dto.user.UserDto;
 import com.example.demo.dto.user.UserEditDto;
 import com.example.demo.entity.enums.Status;
@@ -50,6 +51,7 @@ public class UserController {
 	}
 
 	// @PreAuthorize("hasAuthority('VIEW_USER')")
+	@GetMapping("/{id}")
 	public HttpEntity<?> getUserById(@PathVariable Long id) {
 		try {
 			ApiResponse apiResponse = userService.getUserById(id);
@@ -150,5 +152,11 @@ public class UserController {
 			logger.error("Error giving salary to user {}: {}", username, e.getMessage(), e);
 			return ResponseEntity.status(500).body(new ApiResponse("Error giving salary", false));
 		}
+	}
+	
+	@PostMapping("/update-firebase-token")
+	public HttpEntity<?> updateFirebaseToken(@RequestBody FirebaseTokenRequest firebaseTokenRequest){
+		ApiResponse apiResponse = userService.updateFirebaseToken(firebaseTokenRequest);
+		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 	}
 }

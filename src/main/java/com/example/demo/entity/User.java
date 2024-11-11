@@ -51,6 +51,8 @@ public class User extends AbstractEntity implements UserDetails{
 	@Column(length = 1024)
 	private String token;
 	
+	@Column(length = 1024)
+	private String firebaseToken;
 
     @Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

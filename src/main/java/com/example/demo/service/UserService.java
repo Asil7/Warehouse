@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.user.FirebaseTokenRequest;
 import com.example.demo.dto.user.UserDto;
 import com.example.demo.dto.user.UserEditDto;
 import com.example.demo.dto.user.UserProjection;
@@ -266,6 +267,17 @@ public class UserService {
 			logger.error("Error while giving salary to user {}: {}", username, e.getMessage(), e);
 			return new ApiResponse("Error giving salary", false);
 		}
+	}
+	
+	public ApiResponse updateFirebaseToken(FirebaseTokenRequest firebaseTokenRequest) {
+		Optional<User> optionalUser = userRepository.findByUsername(firebaseTokenRequest.getUsername());
+		if (optionalUser.isPresent()) {
+			User user = optionalUser.get();
+			user.setFirebaseToken(firebaseTokenRequest.getFirebaseToken());
+			userRepository.save(user);
+			return new ApiResponse("Firebase token updated", true);
+		}
+		return new ApiResponse("User not found", false);
 	}
 
 }
