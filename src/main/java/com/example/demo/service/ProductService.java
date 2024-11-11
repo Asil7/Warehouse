@@ -12,63 +12,102 @@ import com.example.demo.payload.ApiResponse;
 import com.example.demo.repository.ProductRepository;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class ProductService {
-	
-	@Autowired
-	ProductRepository productRepository;
-	
-	public ApiResponse createProduct(@Valid ProductDto productDto) {
 
-		if (productRepository.existsByName(productDto.getName())) {
-			return new ApiResponse("Product with the name " + productDto.getName() + " already exists.", false);
-		}
-		
-		Product product = new Product();
-		
-		product.setName(productDto.getName());
-		product.setType(productDto.getType());
-		productRepository.save(product);
-		return new ApiResponse("Product created", true);
-	}
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
-	public ApiResponse editProduct(@Valid Long id, ProductDto productDto) {
+    @Autowired
+    ProductRepository productRepository;
 
-	    Optional<Product> productOptional = productRepository.findById(id);
+    public ApiResponse createProduct(@Valid ProductDto productDto) {
 
-	    if (productOptional.isPresent()) {
-	        Product existingProduct = productOptional.get();
+        try {
+            if (productRepository.existsByName(productDto.getName())) {
+                logger.warn("Product with the name {} already exists", productDto.getName());
+                return new ApiResponse("Product with the name " + productDto.getName() + " already exists.", false);
+            }
 
-	        if (productRepository.existsByNameAndIdNot(productDto.getName(), id)) {
-	            return new ApiResponse("Product with the name " + productDto.getName() + " already exists.", false);
-	        }
+            Product product = new Product();
+            product.setName(productDto.getName());
+            product.setType(productDto.getType());
+            productRepository.save(product);
 
-	        existingProduct.setName(productDto.getName());
-	        existingProduct.setType(productDto.getType());
-	        productRepository.save(existingProduct);
+            logger.info("Product created with name: {}", productDto.getName());
+            return new ApiResponse("Product created", true);
 
-	        return new ApiResponse("Product updated", true);
-	    } else {
-	        return new ApiResponse("Product not found", false);
-	    }
-	}
+        } catch (Exception e) {
+            logger.error("Error creating product: {}", e.getMessage(), e);
+            return new ApiResponse("Error creating product", false);
+        }
+    }
 
+    public ApiResponse editProduct(@Valid Long id, ProductDto productDto) {
 
-	public ApiResponse getAllProducts() {
-		List<Product> productList = productRepository.findAll();
-		return new ApiResponse("Product List", true, productList);
-	}
+        try {
+            Optional<Product> productOptional = productRepository.findById(id);
 
-	public ApiResponse deleteProduct(Long id) {
-		Optional<Product> productOptional = productRepository.findById(id);
-		if (productOptional.isPresent()) {
-			Product product = productOptional.get();
+            if (productOptional.isEmpty()) {
+                logger.warn("Product not found with ID: {}", id);
+                return new ApiResponse("Product not found", false);
+            }
 
-			productRepository.delete(product);
-			return new ApiResponse("Product deleted", true);
-		} else {
-			return new ApiResponse("Product not found", false);
-		}
-	}
+            Product existingProduct = productOptional.get();
+
+            if (productRepository.existsByNameAndIdNot(productDto.getName(), id)) {
+                logger.warn("Product with the name {} already exists for a different ID", productDto.getName());
+                return new ApiResponse("Product with the name " + productDto.getName() + " already exists.", false);
+            }
+
+            existingProduct.setName(productDto.getName());
+            existingProduct.setType(productDto.getType());
+            productRepository.save(existingProduct);
+
+            logger.info("Product updated with ID: {}", id);
+            return new ApiResponse("Product updated", true);
+
+        } catch (Exception e) {
+            logger.error("Error editing product with ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error editing product", false);
+        }
+    }
+
+    public ApiResponse getAllProducts() {
+
+        try {
+            List<Product> productList = productRepository.findAll();
+            logger.info("Fetched {} products", productList.size());
+            return new ApiResponse("Product List", true, productList);
+
+        } catch (Exception e) {
+            logger.error("Error fetching products: {}", e.getMessage(), e);
+            return new ApiResponse("Error fetching products", false);
+        }
+    }
+
+    public ApiResponse deleteProduct(Long id) {
+        logger.info("Deleting product with ID: {}", id);
+
+        try {
+            Optional<Product> productOptional = productRepository.findById(id);
+
+            if (productOptional.isEmpty()) {
+                logger.warn("Product not found with ID: {}", id);
+                return new ApiResponse("Product not found", false);
+            }
+
+            Product product = productOptional.get();
+            productRepository.delete(product);
+
+            logger.info("Product deleted with ID: {}", id);
+            return new ApiResponse("Product deleted", true);
+
+        } catch (Exception e) {
+            logger.error("Error deleting product with ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error deleting product", false);
+        }
+    }
 }

@@ -13,71 +13,111 @@ import com.example.demo.repository.PermissionRepository;
 import com.example.demo.repository.RoleRepository;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class PermissionService {
 
-	@Autowired
-	PermissionRepository permissionRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
-	@Autowired
-	RoleRepository roleRepository;
+    @Autowired
+    PermissionRepository permissionRepository;
 
-	public ApiResponse createPermission(@Valid PermissionDto permissionDto) {
+    @Autowired
+    RoleRepository roleRepository;
 
-		if (permissionRepository.existsByName(permissionDto.getName())) {
-			return new ApiResponse("Permission with the name " + permissionDto.getName() + " already exists.", false);
-		}
+    public ApiResponse createPermission(@Valid PermissionDto permissionDto) {
 
-		Permission permission = new Permission();
-		permission.setName(permissionDto.getName());
-		permission.setDescription(permissionDto.getDescription());
-		permissionRepository.save(permission);
-		return new ApiResponse("Permission successfully created", true);
-	}
+        try {
+            if (permissionRepository.existsByName(permissionDto.getName())) {
+                logger.warn("Permission with the name {} already exists", permissionDto.getName());
+                return new ApiResponse("Permission with the name " + permissionDto.getName() + " already exists.", false);
+            }
 
-	public ApiResponse editPermission(@Valid Long id, PermissionDto permissionDto) {
+            Permission permission = new Permission();
+            permission.setName(permissionDto.getName());
+            permission.setDescription(permissionDto.getDescription());
+            permissionRepository.save(permission);
 
-	    Optional<Permission> permissionOptional = permissionRepository.findById(id);
+            logger.info("Permission created with name: {}", permissionDto.getName());
+            return new ApiResponse("Permission successfully created", true);
 
-	    if (permissionOptional.isPresent()) {
-	        Permission existingPermission = permissionOptional.get();
+        } catch (Exception e) {
+            logger.error("Error creating permission: {}", e.getMessage(), e);
+            return new ApiResponse("Error creating permission", false);
+        }
+    }
 
-	        if (permissionRepository.existsByNameAndIdNot(permissionDto.getName(), id)) {
-	            return new ApiResponse("Permission with the name " + permissionDto.getName() + " already exists.", false);
-	        }
+    public ApiResponse editPermission(@Valid Long id, PermissionDto permissionDto) {
 
-	        // Update the current permission's details
-	        existingPermission.setName(permissionDto.getName());
-	        existingPermission.setDescription(permissionDto.getDescription());
-	        permissionRepository.save(existingPermission);
+        try {
+            Optional<Permission> permissionOptional = permissionRepository.findById(id);
 
-	        return new ApiResponse("Permission updated", true);
-	    } else {
-	        return new ApiResponse("Permission not found", false);
-	    }
-	}
+            if (permissionOptional.isEmpty()) {
+                logger.warn("Permission not found with ID: {}", id);
+                return new ApiResponse("Permission not found", false);
+            }
 
+            Permission existingPermission = permissionOptional.get();
 
-	public ApiResponse getAllPermissions() {
-		List<Permission> permissionList = permissionRepository.findAll();
-		return new ApiResponse("Permission List", true, permissionList);
-	}
+            if (permissionRepository.existsByNameAndIdNot(permissionDto.getName(), id)) {
+                logger.warn("Permission with the name {} already exists for a different ID", permissionDto.getName());
+                return new ApiResponse("Permission with the name " + permissionDto.getName() + " already exists.", false);
+            }
 
-	public ApiResponse deletePermission(Long id) {
-		Optional<Permission> permissOptional = permissionRepository.findById(id);
-		if (permissOptional.isPresent()) {
-			Permission permission = permissOptional.get();
+            existingPermission.setName(permissionDto.getName());
+            existingPermission.setDescription(permissionDto.getDescription());
+            permissionRepository.save(existingPermission);
 
-			boolean isPermissionInUse = roleRepository.existsByPermissionsContaining(permission);
+            logger.info("Permission updated with ID: {}", id);
+            return new ApiResponse("Permission updated", true);
 
-			if (isPermissionInUse) {
-				return new ApiResponse("Permission cannot be deleted as it is assigned to role.", false);
-			}
-			permissionRepository.delete(permission);
-			return new ApiResponse("Permission deleted", true);
-		} else {
-			return new ApiResponse("Permission not found", false);
-		}
-	}
+        } catch (Exception e) {
+            logger.error("Error editing permission with ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error editing permission", false);
+        }
+    }
+
+    public ApiResponse getAllPermissions() {
+
+        try {
+            List<Permission> permissionList = permissionRepository.findAll();
+            logger.info("Fetched {} permissions", permissionList.size());
+            return new ApiResponse("Permission List", true, permissionList);
+
+        } catch (Exception e) {
+            logger.error("Error fetching permissions: {}", e.getMessage(), e);
+            return new ApiResponse("Error fetching permissions", false);
+        }
+    }
+
+    public ApiResponse deletePermission(Long id) {
+
+        try {
+            Optional<Permission> permissionOptional = permissionRepository.findById(id);
+
+            if (permissionOptional.isEmpty()) {
+                logger.warn("Permission not found with ID: {}", id);
+                return new ApiResponse("Permission not found", false);
+            }
+
+            Permission permission = permissionOptional.get();
+
+            boolean isPermissionInUse = roleRepository.existsByPermissionsContaining(permission);
+
+            if (isPermissionInUse) {
+                logger.warn("Permission with ID {} cannot be deleted as it is assigned to a role", id);
+                return new ApiResponse("Permission cannot be deleted as it is assigned to role.", false);
+            }
+
+            permissionRepository.delete(permission);
+            logger.info("Permission deleted with ID: {}", id);
+            return new ApiResponse("Permission deleted", true);
+
+        } catch (Exception e) {
+            logger.error("Error deleting permission with ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error deleting permission", false);
+        }
+    }
 }

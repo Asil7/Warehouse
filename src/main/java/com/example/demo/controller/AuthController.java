@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +21,27 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	@Autowired
-	AuthService authService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-	@Autowired
-	UserService userService;
+    @Autowired
+    AuthService authService;
 
-	@PostMapping("/login")
-	public HttpEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto) {
-		ApiResponse apiResponse = authService.loginUser(loginDto);
-		return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-	}
+    @Autowired
+    UserService userService;
+
+    @PostMapping("/login")
+    public HttpEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto) {
+        try {
+            ApiResponse apiResponse = authService.loginUser(loginDto);
+            if (apiResponse.isSuccess()) {
+                logger.info("User logged in successfully: {}", loginDto.getUsername());
+            } else {
+                logger.warn("Failed login attempt for user: {}", loginDto.getUsername());
+            }
+            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+        } catch (Exception e) {
+            logger.error("Error logging in user {}: ", loginDto.getUsername(), e);
+            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while logging in", false));
+        }
+    }
 }

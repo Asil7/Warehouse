@@ -213,7 +213,7 @@ public class UserService {
 			}
 
 			double dailySalary = user.getSalary() / 30;
-			long daysWorked = ChronoUnit.DAYS.between(user.getDateOfEmployment(), givenDate);
+			long daysWorked = ChronoUnit.DAYS.between(user.getDateOfEmployment(), givenDate) + 1;
 			if (daysWorked < 0) {
 				logger.warn("Invalid given date: {} is before date of employment for user ID {}", givenDate, userId);
 				return new ApiResponse("Invalid date, given date is before date of employment", false);

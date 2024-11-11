@@ -16,127 +16,150 @@ import com.example.demo.repository.OrderProductRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.WarehouseRepository;
 
-// import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class OrderProductService {
 
-	@Autowired
-	OrderProductRepository orderProductRepository;
+    private static final Logger logger = LoggerFactory.getLogger(OrderProductService.class);
 
-	@Autowired
-	WarehouseRepository warehouseRepository;
+    @Autowired
+    OrderProductRepository orderProductRepository;
 
-	@Autowired
-	OrderRepository orderRepository;
+    @Autowired
+    WarehouseRepository warehouseRepository;
 
-	public ApiResponse createOrderProduct(Long orderId, List<OrderProductDto> productList) {
+    @Autowired
+    OrderRepository orderRepository;
 
-		Optional<Order> existingOrder = orderRepository.findById(orderId);
+    public ApiResponse createOrderProduct(Long orderId, List<OrderProductDto> productList) {
 
-		if (existingOrder.isEmpty()) {
-			return new ApiResponse("Order not found", false);
-		}
+        try {
+            Optional<Order> existingOrder = orderRepository.findById(orderId);
 
-		Order order = existingOrder.get();
+            if (existingOrder.isEmpty()) {
+                logger.warn("Order not found with ID: {}", orderId);
+                return new ApiResponse("Order not found", false);
+            }
 
-		List<OrderProduct> orderProducts = new ArrayList<>();
-		double addedWeight = 0.0;
+            Order order = existingOrder.get();
+            List<OrderProduct> orderProducts = new ArrayList<>();
+            double addedWeight = 0.0;
 
-		for (OrderProductDto dto : productList) {
-			OrderProduct orderProduct = new OrderProduct();
-			orderProduct.setProduct(dto.getProduct());
-			orderProduct.setQuantity(dto.getQuantity());
-			orderProduct.setType(dto.getType());
-			orderProduct.setOrder(order);
+            for (OrderProductDto dto : productList) {
+                OrderProduct orderProduct = new OrderProduct();
+                orderProduct.setProduct(dto.getProduct());
+                orderProduct.setQuantity(dto.getQuantity());
+                orderProduct.setType(dto.getType());
+                orderProduct.setOrder(order);
 
-			Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(dto.getProduct());
-			if (existingWarehouseProduct.isPresent()) {
-				Warehouse warehouse = existingWarehouseProduct.get();
-				warehouse.setQuantity(warehouse.getQuantity() - dto.getQuantity());
-				warehouseRepository.save(warehouse);
-			} else {
-				return new ApiResponse("Warehouse product not found for " + dto.getProduct(), false);
-			}
-			
-			if("kg".equals(orderProduct.getType()) || "l".equals(orderProduct.getType())) {
-				addedWeight += dto.getQuantity();
-			}
-			
-			orderProducts.add(orderProduct);
-		}
-		
-		orderProductRepository.saveAll(orderProducts);
-		
-		order.setTotalWeight(order.getTotalWeight() + addedWeight);
-		orderRepository.save(order);
+                Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(dto.getProduct());
+                if (existingWarehouseProduct.isPresent()) {
+                    Warehouse warehouse = existingWarehouseProduct.get();
+                    warehouse.setQuantity(warehouse.getQuantity() - dto.getQuantity());
+                    warehouseRepository.save(warehouse);
+                } else {
+                    logger.warn("Warehouse product not found for product: {}", dto.getProduct());
+                    return new ApiResponse("Warehouse product not found for " + dto.getProduct(), false);
+                }
 
-		return new ApiResponse("Order product created", true);
-	}
+                if ("kg".equals(orderProduct.getType()) || "l".equals(orderProduct.getType())) {
+                    addedWeight += dto.getQuantity();
+                }
 
-	public ApiResponse editOrderProduct(Long id, OrderProductDto orderProductDto) {
+                orderProducts.add(orderProduct);
+            }
 
-		Optional<OrderProduct> existingOrderProduct = orderProductRepository.findById(id);
+            orderProductRepository.saveAll(orderProducts);
+            order.setTotalWeight(order.getTotalWeight() + addedWeight);
+            orderRepository.save(order);
 
-		if (existingOrderProduct.isEmpty()) {
-			return new ApiResponse("Order product not found", false);
-		}
+            logger.info("Order products created successfully for order ID: {}", orderId);
+            return new ApiResponse("Order product created", true);
 
-		OrderProduct orderProduct = existingOrderProduct.get();
+        } catch (Exception e) {
+            logger.error("Error creating order products for order ID {}: {}", orderId, e.getMessage(), e);
+            return new ApiResponse("Error creating order products", false);
+        }
+    }
 
-		Order order = orderProduct.getOrder();
+    public ApiResponse editOrderProduct(Long id, OrderProductDto orderProductDto) {
 
-		Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct());
+        try {
+            Optional<OrderProduct> existingOrderProduct = orderProductRepository.findById(id);
 
-		if (existingWarehouseProduct.isEmpty()) {
-			return new ApiResponse("Warehouse product not found", false);
-		}
+            if (existingOrderProduct.isEmpty()) {
+                logger.warn("Order product not found with ID: {}", id);
+                return new ApiResponse("Order product not found", false);
+            }
 
-		Warehouse warehouse = existingWarehouseProduct.get();
+            OrderProduct orderProduct = existingOrderProduct.get();
+            Order order = orderProduct.getOrder();
+            Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct());
 
-		Long quantityDifference = orderProductDto.getQuantity() - orderProduct.getQuantity();
+            if (existingWarehouseProduct.isEmpty()) {
+                logger.warn("Warehouse product not found for product: {}", orderProduct.getProduct());
+                return new ApiResponse("Warehouse product not found", false);
+            }
 
-		warehouse.setQuantity(warehouse.getQuantity() - quantityDifference);
+            Warehouse warehouse = existingWarehouseProduct.get();
+            Long quantityDifference = orderProductDto.getQuantity() - orderProduct.getQuantity();
+            warehouse.setQuantity(warehouse.getQuantity() - quantityDifference);
+            warehouseRepository.save(warehouse);
 
-		warehouseRepository.save(warehouse);
+            orderProduct.setQuantity(orderProductDto.getQuantity());
+            orderProduct.setType(orderProductDto.getType());
+            orderProductRepository.save(orderProduct);
 
-		orderProduct.setQuantity(orderProductDto.getQuantity());
-		orderProduct.setType(orderProductDto.getType());
+            double totalWeight = orderProductRepository.findTotalQuantityByOrderId(order.getId());
+            order.setTotalWeight(totalWeight);
+            orderRepository.save(order);
 
-		orderProductRepository.save(orderProduct);
+            logger.info("Order product with ID {} updated successfully", id);
+            return new ApiResponse("Order product updated", true);
 
-		double totalWeight = orderProductRepository.findTotalQuantityByOrderId(order.getId());
-		order.setTotalWeight(totalWeight);
-		orderRepository.save(order);
+        } catch (Exception e) {
+            logger.error("Error editing order product with ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error updating order product", false);
+        }
+    }
 
-		return new ApiResponse("Order product updated", true);
-	}
+    public ApiResponse deleteOrderProduct(Long id) {
 
-	public ApiResponse deleteOrderProduct(Long id) {
-		Optional<OrderProduct> existingOrderProduct = orderProductRepository.findById(id);
+        try {
+            Optional<OrderProduct> existingOrderProduct = orderProductRepository.findById(id);
 
-		if (existingOrderProduct.isEmpty()) {
-			return new ApiResponse("Order product not found", false);
-		}
+            if (existingOrderProduct.isEmpty()) {
+                logger.warn("Order product not found with ID: {}", id);
+                return new ApiResponse("Order product not found", false);
+            }
 
-		OrderProduct orderProduct = existingOrderProduct.get();
-		
-		Order order = orderProduct.getOrder();
+            OrderProduct orderProduct = existingOrderProduct.get();
+            Order order = orderProduct.getOrder();
+            Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct());
 
-		Optional<Warehouse> existingWarehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct());
+            if (existingWarehouseProduct.isEmpty()) {
+                logger.warn("Warehouse product not found for product: {}", orderProduct.getProduct());
+                return new ApiResponse("Warehouse product not found", false);
+            }
 
-		Warehouse warehouse = existingWarehouseProduct.get();
+            Warehouse warehouse = existingWarehouseProduct.get();
+            warehouse.setQuantity(warehouse.getQuantity() + orderProduct.getQuantity());
+            warehouseRepository.save(warehouse);
 
-		warehouse.setQuantity(warehouse.getQuantity() + orderProduct.getQuantity());
+            if ("kg".equals(orderProduct.getType()) || "l".equals(orderProduct.getType())) {
+                order.setTotalWeight(order.getTotalWeight() - orderProduct.getQuantity());
+            }
 
-		warehouseRepository.save(warehouse);
-		
-	    if ("kg".equals(orderProduct.getType()) || "l".equals(orderProduct.getType())) {
-	        order.setTotalWeight(order.getTotalWeight() - orderProduct.getQuantity());
-	    }
+            orderProductRepository.delete(orderProduct);
 
-		orderProductRepository.delete(orderProduct);
+            logger.info("Order product with ID {} deleted successfully", id);
+            return new ApiResponse("Order product deleted", true);
 
-		return new ApiResponse("Order product deleted", true);
-	}
+        } catch (Exception e) {
+            logger.error("Error deleting order product with ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error deleting order product", false);
+        }
+    }
 }

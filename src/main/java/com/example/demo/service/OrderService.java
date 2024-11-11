@@ -19,122 +19,183 @@ import com.example.demo.repository.OrderProductRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.WarehouseRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class OrderService {
 
-	@Autowired
-	OrderRepository orderRepository;
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-	@Autowired
-	CompanyRepository companyRepository;
+    @Autowired
+    OrderRepository orderRepository;
 
-	@Autowired
-	OrderProductRepository orderProductRepository;
+    @Autowired
+    CompanyRepository companyRepository;
 
-	@Autowired
-	WarehouseRepository warehouseRepository;
+    @Autowired
+    OrderProductRepository orderProductRepository;
 
-	public ApiResponse createOrder(OrderDto orderDto) {
-		Company company = companyRepository.findById(orderDto.getCompanyId())
-				.orElseThrow(() -> new IllegalArgumentException("Company not found"));
+    @Autowired
+    WarehouseRepository warehouseRepository;
 
-		Order order = new Order();
-		order.setUsername(orderDto.getUsername());
-		order.setDelivered(false);
-		order.setCompany(company);
+    public ApiResponse createOrder(OrderDto orderDto) {
 
-		List<OrderProduct> productList = orderDto.getProductList().stream().map(dto -> {
-			OrderProduct orderProduct = new OrderProduct();
-			orderProduct.setProduct(dto.getProduct());
-			orderProduct.setQuantity(dto.getQuantity());
-			orderProduct.setType(dto.getType());
-			orderProduct.setOrder(order);
-			return orderProduct;
-		}).collect(Collectors.toList());
+        try {
+            Company company = companyRepository.findById(orderDto.getCompanyId())
+                    .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 
-		order.setProductList(productList);
-		orderRepository.save(order);
+            Order order = new Order();
+            order.setUsername(orderDto.getUsername());
+            order.setDelivered(false);
+            order.setCompany(company);
 
-		double totalWeight = orderProductRepository.findTotalQuantityByOrderId(order.getId());
-		order.setTotalWeight(totalWeight);
+            List<OrderProduct> productList = orderDto.getProductList().stream().map(dto -> {
+                OrderProduct orderProduct = new OrderProduct();
+                orderProduct.setProduct(dto.getProduct());
+                orderProduct.setQuantity(dto.getQuantity());
+                orderProduct.setType(dto.getType());
+                orderProduct.setOrder(order);
+                return orderProduct;
+            }).collect(Collectors.toList());
 
-		for (OrderProduct orderProduct : productList) {
-			Warehouse warehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct())
-					.orElseThrow(() -> new IllegalArgumentException(
-							"Product " + orderProduct.getProduct() + " not found in warehouse"));
+            order.setProductList(productList);
+            orderRepository.save(order);
+            logger.info("Order saved successfully with ID: {}", order.getId());
 
-			warehouseProduct.setQuantity(warehouseProduct.getQuantity() - orderProduct.getQuantity());
-			warehouseRepository.save(warehouseProduct);
-		}
+            double totalWeight = orderProductRepository.findTotalQuantityByOrderId(order.getId());
+            order.setTotalWeight(totalWeight);
 
-		return new ApiResponse("Order created successfully", true, order);
-	}
+            for (OrderProduct orderProduct : productList) {
+                Warehouse warehouseProduct = warehouseRepository.findByProduct(orderProduct.getProduct())
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Product " + orderProduct.getProduct() + " not found in warehouse"));
 
-	public ApiResponse getAllOrders() {
-		List<OrderProjection> findAllOrders = orderRepository.findAllOrders();
-		return new ApiResponse("Order List", true, findAllOrders);
-	}
+                warehouseProduct.setQuantity(warehouseProduct.getQuantity() - orderProduct.getQuantity());
+                warehouseRepository.save(warehouseProduct);
+            }
 
-	public ApiResponse getOrdersByUsername(String username) {
-		List<OrderProjection> orders = orderRepository.findOrdersByUsername(username);
-		if (orders.isEmpty()) {
-			return new ApiResponse("No orders found for username: " + username, true, orders);
-		}
-		return new ApiResponse("Orders for username: " + username, true, orders);
-	}
+            return new ApiResponse("Order created successfully", true, order);
 
-	public ApiResponse getOrderById(Long id) {
-		OrderProjection orderById = orderRepository.findOrderById(id);
-		return new ApiResponse("Order by id", true, orderById);
-	}
+        } catch (Exception e) {
+            logger.error("Error creating order for user {}: {}", orderDto.getUsername(), e.getMessage(), e);
+            return new ApiResponse("Error creating order", false);
+        }
+    }
 
-	public ApiResponse getOrderProductsByOrderId(Long orderId) {
-		List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
-		return new ApiResponse("Order Products List", true, orderProducts);
-	}
+    public ApiResponse getAllOrders() {
 
-	public ApiResponse deleteOrder(Long orderId) {
-		Optional<Order> optionalOrder = orderRepository.findById(orderId);
-		if (!optionalOrder.isPresent()) {
-			return new ApiResponse("Order not found", false);
-		}
+        try {
+            List<OrderProjection> findAllOrders = orderRepository.findAllOrders();
+            logger.info("Fetched {} orders", findAllOrders.size());
+            return new ApiResponse("Order List", true, findAllOrders);
 
-		List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
-		if (!orderProducts.isEmpty()) {
+        } catch (Exception e) {
+            logger.error("Error fetching all orders: {}", e.getMessage(), e);
+            return new ApiResponse("Error fetching all orders", false);
+        }
+    }
 
-			for (OrderProduct orderProduct : orderProducts) {
-				Optional<Warehouse> existingWarehouseProduct = warehouseRepository
-						.findByProduct(orderProduct.getProduct());
+    public ApiResponse getOrdersByUsername(String username) {
 
-				if (existingWarehouseProduct.isEmpty()) {
-					return new ApiResponse("Product " + orderProduct.getProduct() + "not found in warehouse", false);
-				}
+        try {
+            List<OrderProjection> orders = orderRepository.findOrdersByUsername(username);
 
-				Warehouse warehouseProduct = existingWarehouseProduct.get();
+            if (orders.isEmpty()) {
+                logger.info("No orders found for username: {}", username);
+                return new ApiResponse("No orders found for username: " + username, true, orders);
+            }
+            return new ApiResponse("Orders for username: " + username, true, orders);
 
-				warehouseProduct.setQuantity(warehouseProduct.getQuantity() + orderProduct.getQuantity());
-				warehouseRepository.save(warehouseProduct);
+        } catch (Exception e) {
+            logger.error("Error fetching orders for username {}: {}", username, e.getMessage(), e);
+            return new ApiResponse("Error fetching orders for username: " + username, false);
+        }
+    }
 
-			}
-			orderProductRepository.deleteAll(orderProducts);
-		}
+    public ApiResponse getOrderById(Long id) {
 
-		orderRepository.deleteById(orderId);
+        try {
+            OrderProjection orderById = orderRepository.findOrderById(id);
+            logger.info("Fetching order with ID: {}", id);
+            return new ApiResponse("Order by id", true, orderById);
 
-		return new ApiResponse("Order deleted", true);
-	}
-	
-	public ApiResponse updateOrderDeliveredStatus(Long id, boolean delivered) {
-		Optional<Order> optionalOrder = orderRepository.findById(id);
-		if(optionalOrder.isEmpty()) {
-			return new ApiResponse("Order not found", false);
-		} 
-		
-		Order order = optionalOrder.get();
-		order.setDelivered(delivered);
-		orderRepository.save(order);
-		
-		return new ApiResponse("Order delivery status updated", true, order);
-	}
+        } catch (Exception e) {
+            logger.error("Error fetching order by ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error fetching order by id", false);
+        }
+    }
 
+    public ApiResponse getOrderProductsByOrderId(Long orderId) {
+
+        try {
+            List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
+            logger.info("Fetching products for order ID: {}", orderId);
+            return new ApiResponse("Order Products List", true, orderProducts);
+
+        } catch (Exception e) {
+            logger.error("Error fetching products for order ID {}: {}", orderId, e.getMessage(), e);
+            return new ApiResponse("Error fetching order products", false);
+        }
+    }
+
+    public ApiResponse deleteOrder(Long orderId) {
+        logger.info("Deleting order with ID: {}", orderId);
+
+        try {
+            Optional<Order> optionalOrder = orderRepository.findById(orderId);
+            if (optionalOrder.isEmpty()) {
+                logger.warn("Order not found with ID: {}", orderId);
+                return new ApiResponse("Order not found", false);
+            }
+
+            List<OrderProduct> orderProducts = orderProductRepository.findByOrderIdSorted(orderId);
+            for (OrderProduct orderProduct : orderProducts) {
+                Optional<Warehouse> existingWarehouseProduct = warehouseRepository
+                        .findByProduct(orderProduct.getProduct());
+
+                if (existingWarehouseProduct.isPresent()) {
+                    Warehouse warehouseProduct = existingWarehouseProduct.get();
+                    warehouseProduct.setQuantity(warehouseProduct.getQuantity() + orderProduct.getQuantity());
+                    warehouseRepository.save(warehouseProduct);
+                } else {
+                    logger.warn("Product {} not found in warehouse while deleting order ID {}", 
+                                orderProduct.getProduct(), orderId);
+                    return new ApiResponse("Product " + orderProduct.getProduct() + " not found in warehouse", false);
+                }
+            }
+
+            orderProductRepository.deleteAll(orderProducts);
+            orderRepository.deleteById(orderId);
+            logger.info("Order deleted with ID: {}", orderId);
+
+            return new ApiResponse("Order deleted", true);
+
+        } catch (Exception e) {
+            logger.error("Error deleting order with ID {}: {}", orderId, e.getMessage(), e);
+            return new ApiResponse("Error deleting order", false);
+        }
+    }
+
+    public ApiResponse updateOrderDeliveredStatus(Long id, boolean delivered) {
+
+        try {
+            Optional<Order> optionalOrder = orderRepository.findById(id);
+            if (optionalOrder.isEmpty()) {
+                logger.warn("Order not found with ID: {}", id);
+                return new ApiResponse("Order not found", false);
+            }
+
+            Order order = optionalOrder.get();
+            order.setDelivered(delivered);
+            orderRepository.save(order);
+            logger.info("Order delivery status updated for order ID: {}", id);
+
+            return new ApiResponse("Order delivery status updated", true, order);
+
+        } catch (Exception e) {
+            logger.error("Error updating delivery status for order ID {}: {}", id, e.getMessage(), e);
+            return new ApiResponse("Error updating order delivery status", false);
+        }
+    }
 }
