@@ -115,4 +115,17 @@ public class OrderController {
             return ResponseEntity.status(500).body(new ApiResponse("An error occurred while updating the order delivered status", false));
         }
     }
+    
+    @PostMapping("/send")
+    public HttpEntity<?> sendNotification(@RequestParam String userToken, 
+            @RequestParam Long orderId) {
+        try {
+            ApiResponse apiResponse = orderService.sendNotification(userToken, orderId);
+            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+        } catch (Exception e) {
+            logger.error("Error send notification: ", e);
+            return ResponseEntity.status(500).body(new ApiResponse("Error send notification", false));
+        }
+    }
+
 }

@@ -18,6 +18,9 @@ import com.example.demo.repository.CompanyRepository;
 import com.example.demo.repository.OrderProductRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.WarehouseRepository;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,6 +199,30 @@ public class OrderService {
         } catch (Exception e) {
             logger.error("Error updating delivery status for order ID {}: {}", id, e.getMessage(), e);
             return new ApiResponse("Error updating order delivery status", false);
+        }
+    }
+    
+    public ApiResponse sendNotification(String userToken, Long orderId) {
+        try {
+            Notification notification = Notification.builder()
+                .setTitle("New Notification")
+                .setBody("You have a new update for Order ID: " + orderId)
+                .build();
+
+            Message message = Message.builder()
+                .setToken(userToken)
+                .setNotification(notification)
+                .putData("route", "/order-list/order-product-list/" + orderId)
+                .build();
+
+            String response = FirebaseMessaging.getInstance().send(message);
+            logger.info("Notification sent successfully: {}", response);
+
+            return new ApiResponse("Notification sent successfully", true);
+
+        } catch (Exception e) {
+            logger.error("Error sending notification: {}", e.getMessage(), e);
+            return new ApiResponse("Failed to send notification", false);
         }
     }
 }
