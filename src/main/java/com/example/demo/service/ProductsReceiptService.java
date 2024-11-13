@@ -28,24 +28,25 @@ public class ProductsReceiptService {
     WarehouseRepository warehouseRepository;
 
     public ApiResponse createProductsReceipt(ProductsReceiptDto productsReceiptDto) {
-        
+
         try {
             Optional<Warehouse> existingWarehouseProduct = warehouseRepository
                     .findByProduct(productsReceiptDto.getProduct());
 
             if (existingWarehouseProduct.isPresent()) {
-                
+
                 Warehouse warehouse = existingWarehouseProduct.get();
                 warehouse.setQuantity(warehouse.getQuantity() + productsReceiptDto.getQuantity());
                 warehouseRepository.save(warehouse);
-                
-                logger.info("Warehouse quantity updated for product: {} to {}", productsReceiptDto.getProduct(), warehouse.getQuantity());
+
+                logger.info("Warehouse quantity updated for product: {} to {}", productsReceiptDto.getProduct(),
+                        warehouse.getQuantity());
             } else {
-                
+
                 Warehouse newWarehouseProduct = new Warehouse(productsReceiptDto.getProduct(),
                         productsReceiptDto.getQuantity(), productsReceiptDto.getType());
                 warehouseRepository.save(newWarehouseProduct);
-                
+
                 logger.info("New warehouse entry created for product: {}", productsReceiptDto.getProduct());
             }
 
@@ -57,7 +58,8 @@ public class ProductsReceiptService {
             return new ApiResponse("Product added", true);
 
         } catch (Exception e) {
-            logger.error("Error creating product receipt for product: {}: {}", productsReceiptDto.getProduct(), e.getMessage(), e);
+            logger.error("Error creating product receipt for product: {}: {}", productsReceiptDto.getProduct(),
+                    e.getMessage(), e);
             return new ApiResponse("Error creating product receipt", false);
         }
     }
@@ -73,7 +75,7 @@ public class ProductsReceiptService {
             }
 
             ProductsReceipt existingProductsReceipt = existingProductsReceiptOpt.get();
-            Long quantityDifference = productsReceiptDto.getQuantity() - existingProductsReceipt.getQuantity();
+            double quantityDifference = productsReceiptDto.getQuantity() - existingProductsReceipt.getQuantity();
 
             existingProductsReceipt.setProduct(productsReceiptDto.getProduct());
             existingProductsReceipt.setQuantity(productsReceiptDto.getQuantity());
@@ -88,11 +90,12 @@ public class ProductsReceiptService {
             if (existingWarehouseProductOpt.isPresent()) {
                 Warehouse warehouse = existingWarehouseProductOpt.get();
                 logger.info("Updating warehouse quantity for product: {}", productsReceiptDto.getProduct());
-                
+
                 warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
                 warehouseRepository.save(warehouse);
-                
-                logger.info("Warehouse quantity updated for product: {} to {}", productsReceiptDto.getProduct(), warehouse.getQuantity());
+
+                logger.info("Warehouse quantity updated for product: {} to {}", productsReceiptDto.getProduct(),
+                        warehouse.getQuantity());
             } else {
                 logger.warn("Warehouse entry not found for product: {}", productsReceiptDto.getProduct());
             }
@@ -125,7 +128,7 @@ public class ProductsReceiptService {
             }
 
             Warehouse warehouse = warehouseProduct.get();
-            
+
             warehouse.setQuantity(warehouse.getQuantity() - productsReceipt.getQuantity());
             warehouseRepository.save(warehouse);
 

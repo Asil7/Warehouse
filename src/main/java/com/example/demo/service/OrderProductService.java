@@ -104,7 +104,7 @@ public class OrderProductService {
             }
 
             Warehouse warehouse = existingWarehouseProduct.get();
-            Long quantityDifference = orderProductDto.getQuantity() - orderProduct.getQuantity();
+            double quantityDifference = orderProductDto.getQuantity() - orderProduct.getQuantity();
             warehouse.setQuantity(warehouse.getQuantity() - quantityDifference);
             warehouseRepository.save(warehouse);
 

@@ -65,7 +65,7 @@ public class StoreHistoryService {
 			}
 
 			StoreHistory store = existingStoreProduct.get();
-			Long quantityDifference = storeDto.getQuantity() - store.getQuantity();
+			double quantityDifference = storeDto.getQuantity() - store.getQuantity();
 
 			store.setProduct(storeDto.getProduct());
 			store.setQuantity(storeDto.getQuantity());

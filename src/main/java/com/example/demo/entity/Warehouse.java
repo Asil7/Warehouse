@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Warehouse extends AbstractEntity{
-	
+public class Warehouse extends AbstractEntity {
+
 	@Column(nullable = false, unique = true)
 	private String product;
 	@Column(nullable = false)
-	private Long quantity;
+	private double quantity;
 	private String type;
 }

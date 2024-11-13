@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WarehouseDto {
 	private String product;
-	private Long quantity;
+	private double quantity;
 	private String type;
 }

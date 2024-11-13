@@ -24,7 +24,7 @@ public class OrderProduct extends AbstractEntity {
     private String product;
 
     @Column(nullable = false)
-    private Long quantity;
+    private double quantity;
 
     private String type;
 

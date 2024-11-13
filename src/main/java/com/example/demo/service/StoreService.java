@@ -146,7 +146,7 @@ public class StoreService {
 				if (warehouse.getQuantity() >= 0) {
 					existingStoreOpt.ifPresent(storeRepository::delete);
 				} else {
-					long positiveQuantity = Math.abs(warehouse.getQuantity());
+					double positiveQuantity = Math.abs(warehouse.getQuantity());
 
 					if (existingStoreOpt.isPresent()) {
 						Store existingStore = existingStoreOpt.get();

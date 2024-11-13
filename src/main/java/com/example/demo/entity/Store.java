@@ -18,7 +18,7 @@ public class Store extends AbstractEntity {
     @Column(nullable = false)
     private String product;
     @Column(nullable = false)
-    private Long quantity;
+    private double quantity;
     private double price;
     private String type;
     private boolean received;
