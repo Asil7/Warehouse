@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 import com.example.demo.entity.template.AbstractEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -28,6 +29,7 @@ public class Order extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
+    @JsonIgnore
     private Company company;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
