@@ -55,14 +55,14 @@ public class DataLoader implements CommandLineRunner {
 			roleRepository.save(role);
 			
 			User user = new User();
-			user.setFullName("Asilbek Fayzullayev");
-			user.setUsername("asilbek");
-			user.setPassword(passwordEncoder.encode("qwerty"));;
+			user.setFullName("Jamshid");
+			user.setUsername("jamshid");
+			user.setPassword(passwordEncoder.encode("1qazxsw2"));;
 			user.setRole(role);
 			user.setStatus(Status.ACTIVE);
 			user.setSalary(5000000.0);
 			user.setDateOfEmployment(LocalDate.of(2024, 10, 01));
-			user.setPhone("+998999999999");
+			user.setPhone("+998 97 768 23 22");
 			userRepository.save(user);
 		}
 	}
