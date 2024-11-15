@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -225,4 +226,23 @@ public class OrderService {
             return new ApiResponse("Failed to send notification", false);
         }
     }
+    
+    public ApiResponse getTodayOrders() {
+        try {
+            LocalDate today = LocalDate.now();
+            List<OrderProjection> todayOrders = orderRepository.findOrdersByDate(today);
+            
+            if (todayOrders.isEmpty()) {
+                logger.info("No orders found for today: {}", today);
+                return new ApiResponse("No orders found for today", false);
+            }
+            logger.info("Fetched {} orders for today: {}", todayOrders.size(), today);
+            return new ApiResponse("Orders found for today", true, todayOrders);
+            
+        } catch (Exception e) {
+            logger.error("Error fetching today's orders: {}", e.getMessage(), e);
+            return new ApiResponse("Error fetching today's orders", false);
+        }
+    }
+
 }

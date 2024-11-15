@@ -127,5 +127,17 @@ public class OrderController {
             return ResponseEntity.status(500).body(new ApiResponse("Error send notification", false));
         }
     }
+    
+    @GetMapping("/today")
+    public HttpEntity<?> getTodayOrder() {
+        try {
+            ApiResponse apiResponse = orderService.getAllOrders();
+            logger.info("Fetched today orders");
+            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+        } catch (Exception e) {
+            logger.error("Error fetching today orders: ", e);
+            return ResponseEntity.status(500).body(new ApiResponse("Error fetching today orders", false));
+        }
+    }
 
 }

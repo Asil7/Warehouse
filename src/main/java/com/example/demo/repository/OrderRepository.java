@@ -2,6 +2,9 @@ package com.example.demo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
 import java.util.List;
 
 import com.example.demo.dto.order.OrderProjection;
@@ -54,5 +57,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "JOIN companies c ON o.company_id = c.id " +
             "WHERE o.id = :id", nativeQuery = true)
 	OrderProjection findOrderById(Long id);
+	
+	@Query(value = "SELECT * FROM orders o WHERE DATE(o.created_at) = :date", nativeQuery = true)
+	List<OrderProjection> findOrdersByDate(@Param("date") LocalDate date);
 
 }
