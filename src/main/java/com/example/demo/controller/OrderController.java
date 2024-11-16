@@ -38,7 +38,8 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error creating order: ", e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while creating the order", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while creating the order", false));
         }
     }
 
@@ -50,7 +51,8 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error fetching orders: ", e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while fetching the orders", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while fetching the orders", false));
         }
     }
 
@@ -63,7 +65,8 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error fetching orders for username {}: ", username, e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while fetching the orders for the user", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while fetching the orders for the user", false));
         }
     }
 
@@ -75,7 +78,8 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error fetching order by ID {}: ", id, e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while fetching the order by ID", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while fetching the order by ID", false));
         }
     }
 
@@ -88,7 +92,8 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error fetching products for order ID {}: ", orderId, e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while fetching the products for the order", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while fetching the products for the order", false));
         }
     }
 
@@ -100,7 +105,8 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error deleting order for Order ID {}: ", orderId, e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while deleting the order", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while deleting the order", false));
         }
     }
 
@@ -112,12 +118,13 @@ public class OrderController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {
             logger.error("Error updating delivered status for Order ID {}: ", id, e);
-            return ResponseEntity.status(500).body(new ApiResponse("An error occurred while updating the order delivered status", false));
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("An error occurred while updating the order delivered status", false));
         }
     }
-    
+
     @PostMapping("/send")
-    public HttpEntity<?> sendNotification(@RequestParam String userToken, 
+    public HttpEntity<?> sendNotification(@RequestParam String userToken,
             @RequestParam Long orderId) {
         try {
             ApiResponse apiResponse = orderService.sendNotification(userToken, orderId);
@@ -127,11 +134,12 @@ public class OrderController {
             return ResponseEntity.status(500).body(new ApiResponse("Error send notification", false));
         }
     }
-    
+
+    @PreAuthorize("hasAuthority('VIEW_TODAY_ORDER_LIST')")
     @GetMapping("/today")
     public HttpEntity<?> getTodayOrder() {
         try {
-            ApiResponse apiResponse = orderService.getAllOrders();
+            ApiResponse apiResponse = orderService.getTodayOrders();
             logger.info("Fetched today orders");
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (Exception e) {

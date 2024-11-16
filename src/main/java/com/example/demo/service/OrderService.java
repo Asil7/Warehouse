@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -163,8 +164,8 @@ public class OrderService {
                     warehouseProduct.setQuantity(warehouseProduct.getQuantity() + orderProduct.getQuantity());
                     warehouseRepository.save(warehouseProduct);
                 } else {
-                    logger.warn("Product {} not found in warehouse while deleting order ID {}", 
-                                orderProduct.getProduct(), orderId);
+                    logger.warn("Product {} not found in warehouse while deleting order ID {}",
+                            orderProduct.getProduct(), orderId);
                     return new ApiResponse("Product " + orderProduct.getProduct() + " not found in warehouse", false);
                 }
             }
@@ -202,19 +203,19 @@ public class OrderService {
             return new ApiResponse("Error updating order delivery status", false);
         }
     }
-    
+
     public ApiResponse sendNotification(String userToken, Long orderId) {
         try {
             Notification notification = Notification.builder()
-                .setTitle("New Notification")
-                .setBody("You have a new update for Order ID: " + orderId)
-                .build();
+                    .setTitle("New Notification")
+                    .setBody("You have a new update for Order ID: " + orderId)
+                    .build();
 
             Message message = Message.builder()
-                .setToken(userToken)
-                .setNotification(notification)
-                .putData("route", "/order-list/order-product-list/" + orderId)
-                .build();
+                    .setToken(userToken)
+                    .setNotification(notification)
+                    .putData("route", "/order-list/order-product-list/" + orderId)
+                    .build();
 
             String response = FirebaseMessaging.getInstance().send(message);
             logger.info("Notification sent successfully: {}", response);
@@ -226,19 +227,21 @@ public class OrderService {
             return new ApiResponse("Failed to send notification", false);
         }
     }
-    
+
     public ApiResponse getTodayOrders() {
         try {
-            LocalDate today = LocalDate.now();
-            List<OrderProjection> todayOrders = orderRepository.findOrdersByDate(today);
-            
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+            List<OrderProjection> todayOrders = orderRepository.findTodayOreders(startOfDay, endOfDay);
+
             if (todayOrders.isEmpty()) {
-                logger.info("No orders found for today: {}", today);
-                return new ApiResponse("No orders found for today", false);
+                logger.info("No orders found for today: {}", startOfDay.toLocalDate());
+                return new ApiResponse("No orders found for today", true, todayOrders);
             }
-            logger.info("Fetched {} orders for today: {}", todayOrders.size(), today);
+            logger.info("Fetched {} orders for today: {}", todayOrders.size(), startOfDay.toLocalDate());
             return new ApiResponse("Orders found for today", true, todayOrders);
-            
+
         } catch (Exception e) {
             logger.error("Error fetching today's orders: {}", e.getMessage(), e);
             return new ApiResponse("Error fetching today's orders", false);
