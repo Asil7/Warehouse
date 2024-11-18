@@ -57,10 +57,10 @@ public class DataLoader implements CommandLineRunner {
 			User user = new User();
 			user.setFullName("Jamshid");
 			user.setUsername("jamshid");
-			user.setPassword(passwordEncoder.encode("1qazxsw2"));;
+			user.setPassword(passwordEncoder.encode("1221"));;
 			user.setRole(role);
 			user.setStatus(Status.ACTIVE);
-			user.setSalary(5000000.0);
+			user.setSalary(6000000.0);
 			user.setDateOfEmployment(LocalDate.of(2024, 10, 01));
 			user.setPhone("+998 97 768 23 22");
 			userRepository.save(user);
