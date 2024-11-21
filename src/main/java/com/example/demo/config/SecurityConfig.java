@@ -32,11 +32,11 @@ public class SecurityConfig {
     AuthService authService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("http://localhost:3000/", "https://warehouse-web-demo.vercel.app/"));
+                configuration.setAllowedOrigins(List.of("http://localhost:3000/", "https://abduvaliota.uz","https://www.abduvaliota.uz", "https://store.abduvaliota.uz:8443"));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
                 configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
                 configuration.setAllowCredentials(true);
