@@ -37,6 +37,7 @@ public class ProductsReceiptService {
 
                 Warehouse warehouse = existingWarehouseProduct.get();
                 warehouse.setQuantity(warehouse.getQuantity() + productsReceiptDto.getQuantity());
+                warehouse.setPrice(productsReceiptDto.getPrice());
                 warehouseRepository.save(warehouse);
 
                 logger.info("Warehouse quantity updated for product: {} to {}", productsReceiptDto.getProduct(),
@@ -44,7 +45,7 @@ public class ProductsReceiptService {
             } else {
 
                 Warehouse newWarehouseProduct = new Warehouse(productsReceiptDto.getProduct(),
-                        productsReceiptDto.getQuantity(), productsReceiptDto.getType());
+                        productsReceiptDto.getQuantity(), productsReceiptDto.getType(), productsReceiptDto.getPrice());
                 warehouseRepository.save(newWarehouseProduct);
 
                 logger.info("New warehouse entry created for product: {}", productsReceiptDto.getProduct());

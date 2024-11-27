@@ -11,4 +11,5 @@ public class WarehouseDto {
 	private String product;
 	private double quantity;
 	private String type;
+	private double price;
 }

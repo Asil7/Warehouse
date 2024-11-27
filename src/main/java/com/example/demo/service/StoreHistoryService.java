@@ -33,12 +33,13 @@ public class StoreHistoryService {
 			if (existingWarehouseProduct.isPresent()) {
 				Warehouse warehouse = existingWarehouseProduct.get();
 				warehouse.setQuantity(warehouse.getQuantity() + storeDto.getQuantity());
+				warehouse.setPrice(storeDto.getPrice());
 				warehouseRepository.save(warehouse);
 				logger.info("Updated warehouse {} product quantity to: {}", warehouse.getProduct(),
 						warehouse.getQuantity());
 			} else {
 				Warehouse newWarehouseProduct = new Warehouse(storeDto.getProduct(), storeDto.getQuantity(),
-						storeDto.getType());
+						storeDto.getType(), storeDto.getPrice());
 				warehouseRepository.save(newWarehouseProduct);
 				logger.info("New warehouse product saved with ID: {}", newWarehouseProduct.getId());
 			}
@@ -79,6 +80,7 @@ public class StoreHistoryService {
 			if (existingWarehouseProductOpt.isPresent()) {
 				Warehouse warehouse = existingWarehouseProductOpt.get();
 				warehouse.setQuantity(warehouse.getQuantity() + quantityDifference);
+				warehouse.setPrice(store.getPrice());
 				warehouseRepository.save(warehouse);
 				logger.info("Updated warehouse product quantity to: {}", warehouse.getQuantity());
 			}

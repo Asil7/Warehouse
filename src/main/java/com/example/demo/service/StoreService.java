@@ -152,12 +152,14 @@ public class StoreService {
 						Store existingStore = existingStoreOpt.get();
 						existingStore.setQuantity(positiveQuantity);
 						existingStore.setType(warehouse.getType());
+						existingStore.setPrice(warehouse.getPrice());
 						storeRepository.save(existingStore);
 					} else {
 						Store newStore = new Store();
 						newStore.setProduct(warehouse.getProduct());
 						newStore.setQuantity(positiveQuantity);
 						newStore.setType(warehouse.getType());
+						newStore.setPrice(warehouse.getPrice());
 						newStore.setReceived(false);
 						newStore.setPaid(false);
 
