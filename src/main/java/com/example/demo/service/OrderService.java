@@ -214,7 +214,7 @@ public class OrderService {
             Message message = Message.builder()
                     .setToken(userToken)
                     .setNotification(notification)
-                    .putData("route", "/order-list/order-product-list/" + orderId)
+                    .putData("route", "/order/products/" + orderId)
                     .build();
 
             String response = FirebaseMessaging.getInstance().send(message);
