@@ -205,10 +205,12 @@ public class OrderService {
     }
 
     public ApiResponse sendNotification(String userToken, Long orderId) {
+    	OrderProjection orderById = orderRepository.findOrderById(orderId);
+    	String company = orderById.getCompany();
         try {
             Notification notification = Notification.builder()
-                    .setTitle("New Notification")
-                    .setBody("You have a new update for Order ID: " + orderId)
+                    .setTitle(company)
+                    .setBody("Mahsulot ortib bo'lindi")
                     .build();
 
             Message message = Message.builder()
@@ -218,9 +220,9 @@ public class OrderService {
                     .build();
 
             String response = FirebaseMessaging.getInstance().send(message);
-            logger.info("Notification sent successfully: {}", response);
+            logger.info("Notification successfully sent: {}", response);
 
-            return new ApiResponse("Notification sent successfully", true);
+            return new ApiResponse("Xabar yuborildi", true);
 
         } catch (Exception e) {
             logger.error("Error sending notification: {}", e.getMessage(), e);
